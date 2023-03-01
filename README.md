@@ -1,0 +1,1 @@
+# Mines project by Piotr Patek
