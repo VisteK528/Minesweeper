@@ -4,6 +4,10 @@
 
 Board::Board(int columns, int rows, int mines)
 {
+    this->columns = columns;
+    this->rows = rows;
+    this->mines = mines;
+    this->flagged_mines = 0;
     // Generowanie losowych liczb
     std::random_device rd;
     const uint_least32_t seed = rd();
@@ -14,10 +18,13 @@ Board::Board(int columns, int rows, int mines)
     // Init board
     for(int i=0; i<rows; i++)
     {
-        std::vector<Cell> row;
+        std::vector<std::vector<Cell>> row;
         for(int j=0; j<columns; j++)
         {
-            row.push_back(Cell(i, j, 0));
+            std::vector<Cell> cell_table;
+            cell_table.push_back(Cell(i, j, 0));
+            cell_table.push_back(Cell(i, j, 'X'));
+            row.push_back(cell_table);
         }
         board_cells.push_back(row);
     }
@@ -27,9 +34,9 @@ Board::Board(int columns, int rows, int mines)
     {
         int row = rows_index(generator);
         int column = columns_index(generator);
-        if(board_cells[row][column].get_value() != 9)
+        if(board_cells[row][column][0].get_value() != 9)
         {
-            board_cells[row][column].set_value(9);
+            board_cells[row][column][0].set_value(9);
             mines--;
         }
     }
@@ -39,20 +46,20 @@ Board::Board(int columns, int rows, int mines)
     {
         for(int j=0; j<columns; j++)
         {
-            if(board_cells[i][j].get_value() != 9)
+            if(board_cells[i][j][0].get_value() != 9)
             {
                 int mines = 0;
                 for(int n=std::max(0,i-1); n<std::min(i+2, rows); n++)
                 {
                     for(int k=std::max(0, j-1); k<std::min(j+2, columns); k++)
                     {
-                        if(board_cells[n][k].get_value()==9)
+                        if(board_cells[n][k][0].get_value()==9)
                         {
                             mines++;
                         }
                     }
                 }
-                board_cells[i][j].set_value(mines);
+                board_cells[i][j][0].set_value(mines);
             }
         }
     }
@@ -60,14 +67,145 @@ Board::Board(int columns, int rows, int mines)
 
 Board::~Board(){};
 
-void Board::display_board()
+void Board::display_board(int mode)
+{
+    int i = 0;
+    std::cout<<"    ";
+    for(int j = 0; j < columns; j++)
+    {
+        std::cout<<j%10<<' ';
+    }
+    std::cout<<std::endl;
+    std::cout<<std::endl;
+    for(auto row: Board::board_cells)
+    {
+        if(i < 10)
+        {
+            std::cout<<i<<"   ";
+        }
+        else
+        {
+            std::cout<<i<<"  ";
+        }
+        for(auto cell: row)
+        {
+            if(mode==1)
+            {
+                std::cout<<cell[0].get_value()<<' ';
+            }
+            else
+            {
+                int value = cell[1].get_value();
+                if(value == 88 or value == 70)
+                {
+                    std::cout<<(char)value<<' ';
+                }
+                else
+                {
+                    std::cout<<value<<' ';
+                }
+            }
+        }
+        std::cout<<std::endl;
+        i++;
+    }
+}
+
+void Board::uncover_zeros(int column, int row)
+{
+    int i;
+    if(column > 0)i=column-1;else i=0;
+    for(i; i<std::min(column+2, columns); i++)
+    {
+        int j;
+        if(row > 0)j=row-1; else j=0;
+        for(j; j<std::min(row+2, rows); j++)
+        {
+            if(board_cells[j][i][1].get_value() == 'X')
+            {
+                int value = board_cells[j][i][0].get_value();
+                board_cells[j][i][1].set_value(value);
+                if(value == 0)
+                {
+                    uncover_zeros(i, j);
+                }
+            }
+        }
+    }
+}
+
+int Board::make_move(int column, int row, char move_type)
+{
+    /*
+        Move types:
+        1. Uncover
+        2. Flag
+
+        Returns:
+        1. 0 - game carries on
+        2. 1 - game over
+        3. 5 - not valid coordinates
+        4. 2 - game won
+    */
+    if(0<=column && column < columns && 0 <= row && row < rows)
+    {
+        int value = board_cells[row][column][0].get_value();
+        if(move_type=='1')
+        {
+            if(value != 9)
+            {
+                if(value == 0)
+                {
+                    uncover_zeros(column, row);
+                }
+                else
+                {
+                    board_cells[row][column][1].set_value(value);
+                }
+            }
+            else
+            {
+                return 1;   // Game over
+            }
+        }
+        else
+        {
+            board_cells[row][column][1].set_value('F');
+            if(value == 9)
+            {
+                flagged_mines ++;
+            }
+        }
+        if(check_if_winning())
+        {
+            return 2;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        return 5;   // Not valid move
+    }
+}
+
+bool Board::check_if_winning()
 {
     for(auto row: Board::board_cells)
     {
         for(auto cell: row)
         {
-            std::cout<<cell.get_value()<<' ';
+            if(cell[1].get_value() == 'X')
+            {
+                return false;
+            }
         }
-        std::cout<<std::endl;
     }
+    if(flagged_mines == mines)
+    {
+        return true;
+    }
+    return false;
 }
