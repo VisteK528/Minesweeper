@@ -9,7 +9,7 @@ class Board
     public:
         void load_board_with_random_values();
         void display_board();
-        Board(int rows, int columns);
+        Board(int rows, int columns, int mines);
         ~Board();
 
     private:
