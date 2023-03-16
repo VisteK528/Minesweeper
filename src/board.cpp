@@ -14,12 +14,12 @@ Board::Board(int columns, int rows, int mines)
 
 Board::~Board(){};
 
-std::vector<std::vector<std::vector<Cell>>> Board::getBoard()
+std::vector<std::vector<std::pair<Cell, Cell>>> Board::getBoard()
 {
     return this->board_cells;
 }
 
-void Board::setBoard(std::vector<std::vector<std::vector<Cell>>> board)
+void Board::setBoard(std::vector<std::vector<std::pair<Cell, Cell>>> board)
 {
     this->board_cells = board;
 }
@@ -38,13 +38,11 @@ void Board::load_board_with_random_values(unsigned int mines)
     // Init board
     for(int i=0; i<rows; i++)
     {
-        std::vector<std::vector<Cell>> row;
+        std::vector<std::pair<Cell, Cell>> row;
         for(int j=0; j<columns; j++)
         {
-            std::vector<Cell> cell_table;
-            cell_table.push_back(Cell(i, j, 0));
-            cell_table.push_back(Cell(i, j, 'X'));
-            row.push_back(cell_table);
+            std::pair<Cell, Cell> p(Cell(i, j, 0), Cell(i, j, 'X'));
+            row.push_back(p);
         }
         board_cells.push_back(row);
     }
@@ -54,9 +52,9 @@ void Board::load_board_with_random_values(unsigned int mines)
     {
         int row = rows_index(generator);
         int column = columns_index(generator);
-        if(board_cells[row][column][0].getValue() != 9)
+        if(board_cells[row][column].first.getValue() != 9)
         {
-            board_cells[row][column][0].setValue(9);
+            board_cells[row][column].first.setValue(9);
             mines--;
         }
     }
@@ -66,20 +64,20 @@ void Board::load_board_with_random_values(unsigned int mines)
     {
         for(int j=0; j<columns; j++)
         {
-            if(board_cells[i][j][0].getValue() != 9)
+            if(board_cells[i][j].first.getValue() != 9)
             {
                 int mines = 0;
                 for(int n=std::max(0,i-1); n<std::min(i+2, rows); n++)
                 {
                     for(int k=std::max(0, j-1); k<std::min(j+2, columns); k++)
                     {
-                        if(board_cells[n][k][0].getValue()==9)
+                        if(board_cells[n][k].first.getValue()==9)
                         {
                             mines++;
                         }
                     }
                 }
-                board_cells[i][j][0].setValue(mines);
+                board_cells[i][j].first.setValue(mines);
             }
         }
     }
@@ -109,11 +107,11 @@ void Board::display_board(int mode)
         {
             if(mode==1)
             {
-                std::cout<<cell[0].getValue()<<' ';
+                std::cout<<cell.first.getValue()<<' ';
             }
             else
             {
-                int value = cell[1].getValue();
+                int value = cell.second.getValue();
                 if(value == 88 or value == 70)
                 {
                     std::cout<<(char)value<<' ';
@@ -138,11 +136,11 @@ unsigned int Board::uncover(int column, int row)
     {
         for(int j = std::max(row-1,0); j<max_j; j++)
         {
-            if(board_cells[j][i][1].getValue() == 'X')
+            if(board_cells[j][i].second.getValue() == 'X')
             {
-                int value = board_cells[j][i][0].getValue();
-                char masked_value = board_cells[j][i][1].getValue();
-                board_cells[j][i][1].setValue(value);
+                int value = board_cells[j][i].first.getValue();
+                char masked_value = board_cells[j][i].second.getValue();
+                board_cells[j][i].second.setValue(value);
                 if(value == 9 && masked_value != 'F')
                 {
                     unflagged_mines++;
@@ -172,8 +170,8 @@ int Board::make_move(int column, int row, char move_type)
     */
     if(0<=column && column < columns && 0 <= row && row < rows)
     {
-        int value = board_cells[row][column][0].getValue();
-        char masked_value = board_cells[row][column][1].getValue();
+        int value = board_cells[row][column].first.getValue();
+        char masked_value = board_cells[row][column].second.getValue();
         if(move_type=='1')
         {
             if(masked_value == 'X')
@@ -186,7 +184,7 @@ int Board::make_move(int column, int row, char move_type)
                     }
                     else
                     {
-                        board_cells[row][column][1].setValue(value);
+                        board_cells[row][column].second.setValue(value);
                     }
                 }
                 else
@@ -206,7 +204,7 @@ int Board::make_move(int column, int row, char move_type)
         {
             if(masked_value == 'X')
             {
-                board_cells[row][column][1].setValue('F');
+                board_cells[row][column].second.setValue('F');
                 if(value == 9)
                 {
                     flagged_mines ++;
@@ -214,7 +212,7 @@ int Board::make_move(int column, int row, char move_type)
             }
             else if(masked_value == 'F')
             {
-                board_cells[row][column][1].setValue('X');
+                board_cells[row][column].second.setValue('X');
                 if(value == 9)
                 {
                     flagged_mines --;
@@ -243,11 +241,11 @@ bool Board::check_if_winning()
     {
         for(auto cell: row)
         {
-            if(cell[1].getValue() == 'X')
+            if(cell.second.getValue() == 'X')
             {
                 return false;
             }
-            if(cell[1].getValue() == 'F' && cell[0].getValue() == 9)
+            if(cell.second.getValue() == 'F' && cell.first.getValue() == 9)
             {
                 correctly_flagged++;
                 if(correctly_flagged == flagged_mines && correctly_flagged == mines)

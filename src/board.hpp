@@ -9,7 +9,7 @@ class Board
     private:
         unsigned int uncover(int column, int row);
         bool check_if_winning();
-        std::vector<std::vector<std::vector<Cell>>> board_cells;
+        std::vector<std::vector<std::pair<Cell, Cell>>> board_cells;
         std::vector<std::vector<int>> selected_cells;
         int mines;
         int rows;
@@ -17,8 +17,8 @@ class Board
         int flagged_mines;
 
     public:
-        std::vector<std::vector<std::vector<Cell>>> getBoard();
-        void setBoard(std::vector<std::vector<std::vector<Cell>>> board);
+        std::vector<std::vector<std::pair<Cell, Cell>>> getBoard();
+        void setBoard(std::vector<std::vector<std::pair<Cell, Cell>>> board);
         void load_board_with_random_values(unsigned int mines);
         int make_move(int column, int row, char move_type);
         void display_board(int mode);
