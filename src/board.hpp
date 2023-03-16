@@ -7,7 +7,7 @@
 class Board
 {
     private:
-        void uncover_zeros(int column, int row);
+        unsigned int uncover(int column, int row);
         bool check_if_winning();
         std::vector<std::vector<std::vector<Cell>>> board_cells;
         std::vector<std::vector<int>> selected_cells;

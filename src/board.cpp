@@ -34,9 +34,9 @@ Board::Board(int columns, int rows, int mines)
     {
         int row = rows_index(generator);
         int column = columns_index(generator);
-        if(board_cells[row][column][0].get_value() != 9)
+        if(board_cells[row][column][0].getValue() != 9)
         {
-            board_cells[row][column][0].set_value(9);
+            board_cells[row][column][0].setValue(9);
             mines--;
         }
     }
@@ -46,20 +46,20 @@ Board::Board(int columns, int rows, int mines)
     {
         for(int j=0; j<columns; j++)
         {
-            if(board_cells[i][j][0].get_value() != 9)
+            if(board_cells[i][j][0].getValue() != 9)
             {
                 int mines = 0;
                 for(int n=std::max(0,i-1); n<std::min(i+2, rows); n++)
                 {
                     for(int k=std::max(0, j-1); k<std::min(j+2, columns); k++)
                     {
-                        if(board_cells[n][k][0].get_value()==9)
+                        if(board_cells[n][k][0].getValue()==9)
                         {
                             mines++;
                         }
                     }
                 }
-                board_cells[i][j][0].set_value(mines);
+                board_cells[i][j][0].setValue(mines);
             }
         }
     }
@@ -91,11 +91,11 @@ void Board::display_board(int mode)
         {
             if(mode==1)
             {
-                std::cout<<cell[0].get_value()<<' ';
+                std::cout<<cell[0].getValue()<<' ';
             }
             else
             {
-                int value = cell[1].get_value();
+                int value = cell[1].getValue();
                 if(value == 88 or value == 70)
                 {
                     std::cout<<(char)value<<' ';
@@ -111,27 +111,32 @@ void Board::display_board(int mode)
     }
 }
 
-void Board::uncover_zeros(int column, int row)
+unsigned int Board::uncover(int column, int row)
 {
-    int i;
-    if(column > 0)i=column-1;else i=0;
-    for(i; i<std::min(column+2, columns); i++)
+    int unflagged_mines = 0;
+    int max_i = std::min(column+2, columns);
+    int max_j = std::min(row+2, rows);
+    for(int i = std::max(column-1, 0); i<max_i; i++)
     {
-        int j;
-        if(row > 0)j=row-1; else j=0;
-        for(j; j<std::min(row+2, rows); j++)
+        for(int j = std::max(row-1,0); j<max_j; j++)
         {
-            if(board_cells[j][i][1].get_value() == 'X')
+            if(board_cells[j][i][1].getValue() == 'X')
             {
-                int value = board_cells[j][i][0].get_value();
-                board_cells[j][i][1].set_value(value);
-                if(value == 0)
+                int value = board_cells[j][i][0].getValue();
+                char masked_value = board_cells[j][i][1].getValue();
+                board_cells[j][i][1].setValue(value);
+                if(value == 9 && masked_value != 'F')
                 {
-                    uncover_zeros(i, j);
+                    unflagged_mines++;
+                }
+                else if(value == 0)
+                {
+                    uncover(i, j);
                 }
             }
         }
     }
+    return unflagged_mines;
 }
 
 int Board::make_move(int column, int row, char move_type)
@@ -149,31 +154,57 @@ int Board::make_move(int column, int row, char move_type)
     */
     if(0<=column && column < columns && 0 <= row && row < rows)
     {
-        int value = board_cells[row][column][0].get_value();
+        int value = board_cells[row][column][0].getValue();
+        char masked_value = board_cells[row][column][1].getValue();
         if(move_type=='1')
         {
-            if(value != 9)
+            if(masked_value == 'X')
             {
-                if(value == 0)
+                if(value != 9)
                 {
-                    uncover_zeros(column, row);
+                    if(value == 0)
+                    {
+                        uncover(column, row);
+                    }
+                    else
+                    {
+                        board_cells[row][column][1].setValue(value);
+                    }
                 }
                 else
                 {
-                    board_cells[row][column][1].set_value(value);
+                    return 1;   // Game over
                 }
             }
             else
             {
-                return 1;   // Game over
+                if(uncover(column, row) > 0)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
             }
         }
         else
         {
-            board_cells[row][column][1].set_value('F');
-            if(value == 9)
+            if(masked_value == 'X')
             {
-                flagged_mines ++;
+                board_cells[row][column][1].setValue('F');
+                if(value == 9)
+                {
+                    flagged_mines ++;
+                }
+            }
+            else if(masked_value == 'F')
+            {
+                board_cells[row][column][1].setValue('X');
+                if(value == 9)
+                {
+                    flagged_mines --;
+                }
             }
         }
         if(check_if_winning())
@@ -197,7 +228,7 @@ bool Board::check_if_winning()
     {
         for(auto cell: row)
         {
-            if(cell[1].get_value() == 'X')
+            if(cell[1].getValue() == 'X')
             {
                 return false;
             }

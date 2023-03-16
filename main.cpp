@@ -3,8 +3,8 @@
 
 int main()
 {
-    // Board board(20, 20, 50);
-    Board board(4, 4, 2);
+     Board board(20, 20, 50);
+    //Board board(4, 4, 2);
     int result;
     while(true)
     {

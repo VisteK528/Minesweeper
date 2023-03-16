@@ -2,37 +2,51 @@
 
 Cell::Cell(int x, int y, int value)
 {
-    this->x = x;
-    this->y = y;
+    setX(x);
+    setY(y);
     this->value = value;
 }
 
-void Cell::set_x(int x)
+void Cell::setX(int x)
 {
-    this->x = x;
+    if(x < 0)
+    {
+        throw InvalidPositionError("X position have to be greater than 0!");
+    }
+    else
+    {
+        this->x = x;
+    }
 }
 
-void Cell::set_y(int y)
+void Cell::setY(int y)
 {
-    this->y = y;
+    if(y < 0)
+    {
+        throw InvalidPositionError("Y position have to be greater than 0!");
+    }
+    else
+    {
+        this->y = y;
+    }
 }
 
-void Cell::set_value(int value)
+void Cell::setValue(int value)
 {
     this->value = value;
 }
 
-int Cell::get_x()
+int Cell::getX()
 {
     return x;
 }
 
-int Cell::get_y()
+int Cell::getY()
 {
     return y;
 }
 
-int Cell::get_value()
+int Cell::getValue()
 {
     return value;
 }
