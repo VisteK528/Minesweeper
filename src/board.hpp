@@ -17,8 +17,7 @@ class Board
         int flagged_mines;
 
     public:
-        void load_board_with_random_values();
-        void display_masked_board();
+        void load_board_with_random_values(unsigned int mines);
         int make_move(int column, int row, char move_type);
         void display_board(int mode);
         Board(){};

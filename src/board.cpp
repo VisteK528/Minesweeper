@@ -8,12 +8,22 @@ Board::Board(int columns, int rows, int mines)
     this->rows = rows;
     this->mines = mines;
     this->flagged_mines = 0;
+
+    load_board_with_random_values(mines);
+}
+
+Board::~Board(){};
+
+void Board::load_board_with_random_values(unsigned int mines)
+{
     // Generowanie losowych liczb
     std::random_device rd;
     const uint_least32_t seed = rd();
     std::mt19937 generator(seed);
     std::uniform_int_distribution<uint_least32_t> rows_index(0, rows-1);
     std::uniform_int_distribution<uint_least32_t> columns_index(0, columns-1);
+
+    board_cells.clear();
 
     // Init board
     for(int i=0; i<rows; i++)
@@ -64,8 +74,6 @@ Board::Board(int columns, int rows, int mines)
         }
     }
 }
-
-Board::~Board(){};
 
 void Board::display_board(int mode)
 {

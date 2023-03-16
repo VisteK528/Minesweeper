@@ -7,6 +7,7 @@
 class Game
 {
     private:
+        bool game_on = true;
         int rows;
         int columns;
         int mines;
