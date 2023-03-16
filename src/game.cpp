@@ -50,13 +50,13 @@ void Game::run()
                     board.load_board_with_random_values(mines);
                 }
                 break;
-            case 2:
+            case 5:
                 std::cout<<"Invalid input!"<<std::endl;
                 std::cin.ignore();
                 std::cout<<"Press enter to continue...";
                 std::cin.ignore();
                 break;
-            case 5:
+            case 2:
                 std::cout<<"YOU WON!!!"<<std::endl;
                 std::cout<<"Do you want to play again? y/n: ";
                 std::cin>>choice;

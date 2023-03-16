@@ -14,6 +14,16 @@ Board::Board(int columns, int rows, int mines)
 
 Board::~Board(){};
 
+std::vector<std::vector<std::vector<Cell>>> Board::getBoard()
+{
+    return this->board_cells;
+}
+
+void Board::setBoard(std::vector<std::vector<std::vector<Cell>>> board)
+{
+    this->board_cells = board;
+}
+
 void Board::load_board_with_random_values(unsigned int mines)
 {
     // Generowanie losowych liczb
@@ -190,10 +200,6 @@ int Board::make_move(int column, int row, char move_type)
                 {
                     return 1;
                 }
-                else
-                {
-                    return 0;
-                }
             }
         }
         else
@@ -232,6 +238,7 @@ int Board::make_move(int column, int row, char move_type)
 
 bool Board::check_if_winning()
 {
+    int correctly_flagged = 0;
     for(auto row: Board::board_cells)
     {
         for(auto cell: row)
@@ -240,11 +247,15 @@ bool Board::check_if_winning()
             {
                 return false;
             }
+            if(cell[1].getValue() == 'F' && cell[0].getValue() == 9)
+            {
+                correctly_flagged++;
+                if(correctly_flagged == flagged_mines && correctly_flagged == mines)
+                {
+                    return true;
+                }
+            }
         }
-    }
-    if(flagged_mines == mines)
-    {
-        return true;
     }
     return false;
 }
