@@ -5,6 +5,7 @@ Cell::Cell(int x, int y, int value)
     setX(x);
     setY(y);
     this->value = value;
+    setMaskedValue('X');
 }
 
 void Cell::setX(int x)
@@ -36,6 +37,11 @@ void Cell::setValue(int value)
     this->value = value;
 }
 
+void Cell::setMaskedValue(int masked_value)
+{
+    this->masked_value=masked_value;
+}
+
 int Cell::getX()
 {
     return x;
@@ -49,4 +55,9 @@ int Cell::getY()
 int Cell::getValue()
 {
     return value;
+}
+
+int Cell::getMaskedValue()
+{
+    return masked_value;
 }

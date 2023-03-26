@@ -10,14 +10,17 @@ private:
     unsigned int x;
     unsigned int y;
     int value;
+    int masked_value;
 public:
     Cell(int x, int y, int value);
     int getX();
     int getY();
     int getValue();
+    int getMaskedValue();
     void setX(int x);
     void setY(int y);
     void setValue(int value);
+    void setMaskedValue(int masked_value);
 };
 
 class InvalidPositionError: public std::exception
