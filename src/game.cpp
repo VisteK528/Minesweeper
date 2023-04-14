@@ -65,6 +65,15 @@ void Game::updateBoard()
             case 70:
                 row.push_back(std::make_shared<sf::Sprite>(*textures[4]));
                 break;
+            case 87:
+                row.push_back(std::make_shared<sf::Sprite>(*textures[8]));
+                break;
+            case 111:
+                row.push_back(std::make_shared<sf::Sprite>(*textures[10]));
+                break;
+            case 73:
+                row.push_back(std::make_shared<sf::Sprite>(*textures[9]));
+                break;
             case 0:
                 row.push_back(std::make_shared<sf::Sprite>(*textures[11]));
                 break;
@@ -87,12 +96,7 @@ void Game::updateBoard()
 
 void Game::runGraphics()
 {
-    auto t1 = std::chrono::system_clock::now();
     updateBoard();
-    auto t2 = std::chrono::system_clock::now();
-    auto elapsed = t2-t1;
-    //std::cout<<elapsed.count()<<std::endl;
-
     window->setFramerateLimit(120);
     while(window->isOpen())
     {
@@ -109,11 +113,10 @@ void Game::runGraphics()
 void Game::runGame()
 {
     loadTextures();
-    std::thread graphics(&Game::runGraphics, this);
     std::thread input(&Game::run, this);
-
+    std::thread graphics(&Game::runGraphics, this);
+    graphics.join();
     input.join();
-    graphics.~thread();
 }
 
 void Game::run()
@@ -139,7 +142,7 @@ void Game::run()
         std::system("clear");
         board.display_board(0);
         std::cout<<std::endl;
-        renderSprites();
+        updateBoard();
         char choice;
         switch(result)
         {

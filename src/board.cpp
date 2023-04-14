@@ -12,9 +12,7 @@ Board::Board(int columns, int rows, int mines)
     load_board_with_random_values(mines);
 }
 
-Board::~Board(){};
-
-std::vector<std::vector<Cell>> Board::getBoard()
+std::vector<std::vector<Cell>> Board::getBoard() const
 {
     return this->board_cells;
 }
@@ -111,7 +109,7 @@ void Board::display_board(int mode)
             else
             {
                 int value = cell.getMaskedValue();
-                if(value == 88 or value == 70)
+                if(value == 88 || value == 70 || value == 111 || value == 87 || value == 73)
                 {
                     std::cout<<(char)value<<' ';
                 }
@@ -126,20 +124,21 @@ void Board::display_board(int mode)
     }
 }
 
-unsigned int Board::uncover(int column, int row)
+unsigned int Board::uncover(int row, int column)
 {
     int unflagged_mines = 0;
-    int max_i = std::min(column+2, columns);
-    int max_j = std::min(row+2, rows);
-    for(int i = std::max(column-1, 0); i<max_i; i++)
+    int max_i = std::min(row+2, rows);
+    int max_j = std::min(column+2, columns);
+
+    for(int i = std::max(row-1, 0); i<max_i; i++)
     {
-        for(int j = std::max(row-1,0); j<max_j; j++)
+        for(int j = std::max(column-1,0); j<max_j; j++)
         {
-            if(board_cells[j][i].getMaskedValue() == 'X')
+            if(board_cells[i][j].getMaskedValue() == 'X')
             {
-                int value = board_cells[j][i].getValue();
-                char masked_value = board_cells[j][i].getMaskedValue();
-                board_cells[j][i].setMaskedValue(value);
+                int value = board_cells[i][j].getValue();
+                char masked_value = board_cells[i][j].getMaskedValue();
+                board_cells[i][j].setMaskedValue(value);
                 if(value == 9 && masked_value != 'F')
                 {
                     unflagged_mines++;
@@ -152,6 +151,25 @@ unsigned int Board::uncover(int column, int row)
         }
     }
     return unflagged_mines;
+}
+
+void Board::gameOverUncover(unsigned int row, unsigned int column)
+{
+    board_cells[row][column].setMaskedValue(111);   // Set game over mine field to 'o'
+    for(auto& row: board_cells)
+    {
+        for(auto& cell: row)
+        {
+            if(cell.getValue() == 9 && cell.getMaskedValue() == 88)
+            {
+                cell.setMaskedValue(87);            // Set all remaining bombs fields to "W", (Went off)
+            }
+            else if(cell.getMaskedValue() == 70 && cell.getValue() != 9)
+            {
+                cell.setMaskedValue(73);            // Set all invalidly flagged bombs to "I", (Invalid)
+            }
+        }
+    }
 }
 
 int Board::make_move(int column, int row, char move_type)
@@ -179,7 +197,7 @@ int Board::make_move(int column, int row, char move_type)
                 {
                     if(value == 0)
                     {
-                        uncover(column, row);
+                        uncover(row, column);
                     }
                     else
                     {
@@ -188,13 +206,15 @@ int Board::make_move(int column, int row, char move_type)
                 }
                 else
                 {
+                    gameOverUncover(row, column);
                     return 1;   // Game over
                 }
             }
             else
             {
-                if(uncover(column, row) > 0)
+                if(uncover(row, column) > 0)
                 {
+                    gameOverUncover(row, column);
                     return 1;
                 }
             }
@@ -233,9 +253,9 @@ int Board::make_move(int column, int row, char move_type)
     }
 }
 
-bool Board::check_if_winning()
+bool Board::check_if_winning() const
 {
-    int correctly_flagged = 0;
+    unsigned int correctly_flagged = 0;
     for(auto row: Board::board_cells)
     {
         for(auto cell: row)

@@ -7,24 +7,28 @@
 class Board
 {
     private:
-        unsigned int uncover(int column, int row);
-        bool check_if_winning();
         std::vector<std::vector<Cell>> board_cells;
         std::vector<std::vector<int>> selected_cells;
-        int mines;
+        unsigned int mines;
+        unsigned int flagged_mines;
+
         int rows;
         int columns;
-        int flagged_mines;
+
+        //Methods
+        unsigned int uncover(int column, int row);
+        bool check_if_winning() const;
+        void gameOverUncover(unsigned int row, unsigned int column);
 
     public:
-        std::vector<std::vector<Cell>> getBoard();
+    Board(){};
+        Board(int rows, int columns, int mines);
+
+        std::vector<std::vector<Cell>> getBoard() const;
         void setBoard(std::vector<std::vector<Cell>> board);
         void load_board_with_random_values(unsigned int mines);
         int make_move(int column, int row, char move_type);
         void display_board(int mode);
-        Board(){};
-        Board(int rows, int columns, int mines);
-        ~Board();
 };
 
 #endif
