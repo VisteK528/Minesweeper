@@ -20,6 +20,7 @@ void Game::initWindow()
 {
     //this -> window = new sf::RenderWindow(sf::VideoMode(800, 800), "Minesweeper");
     this->window = std::make_unique<sf::RenderWindow>(sf::VideoMode(800, 800), "Minesweeper");
+    window->setKeyRepeatEnabled(false);
 }
 
 
@@ -96,27 +97,92 @@ void Game::updateBoard()
 
 void Game::runGraphics()
 {
+    float tile_size = 800/columns;
+    unsigned int result;
     updateBoard();
     window->setFramerateLimit(120);
     while(window->isOpen())
     {
+        sf::Vector2i position = sf::Mouse::getPosition(*window);
+        int column_pos = (int)(position.x/tile_size);
+        int row_pos = (int)(position.y/tile_size);
         sf::Event e;
         while(window->pollEvent(e))
         {
             if(e.type == sf::Event::Closed) window->close();
+
+            if(e.type == sf::Event::MouseButtonReleased)
+            {
+                if(e.mouseButton.button == sf::Mouse::Left)
+                {
+                    result = board.make_move(column_pos, row_pos, '1');
+                }
+                else if(e.mouseButton.button == sf::Mouse::Right)
+                {
+                    result = board.make_move(column_pos, row_pos, 'F');
+                }
+                updateBoard();
+            }
         }
         renderSprites();
         window->display();
+        char choice;
+        switch(result)
+        {
+            case 1:
+                std::cout<<"Game over!"<<std::endl;
+                std::cout<<"Do you want to play again? y/n: ";
+                std::cin>>choice;
+                if(choice == 'n')
+                {
+                    game_on = false;
+                }
+                else
+                {
+                    board.load_board_with_random_values(mines);
+                    updateBoard();
+                }
+                result = 0;
+                break;
+            case 5:
+                std::cout<<"Invalid input!"<<std::endl;
+                std::cin.ignore();
+                std::cout<<"Press enter to continue...";
+                std::cin.ignore();
+                result = 0;
+                break;
+            case 2:
+                std::cout<<"YOU WON!!!"<<std::endl;
+                std::cout<<"Do you want to play again? y/n: ";
+                std::cin>>choice;
+                if(choice == 'n')
+                {
+                    game_on = false;
+                }
+                else
+                {
+                    board.load_board_with_random_values(mines);
+                    updateBoard();
+                }
+                result = 0;
+                break;
+            default:
+                break;
+        }
+        if(!game_on)
+        {
+            break;
+        }
     }
 }
 
 void Game::runGame()
 {
     loadTextures();
-    std::thread input(&Game::run, this);
+    //std::thread input(&Game::run, this);
     std::thread graphics(&Game::runGraphics, this);
     graphics.join();
-    input.join();
+    //input.join();
 }
 
 void Game::run()
