@@ -267,12 +267,12 @@ bool Board::check_if_winning() const
             if(cell.getMaskedValue() == 'F' && cell.getValue() == 9)
             {
                 correctly_flagged++;
-                if(correctly_flagged == flagged_mines && correctly_flagged == mines)
-                {
-                    return true;
-                }
             }
         }
+    }
+    if(correctly_flagged == flagged_mines && correctly_flagged == mines)
+    {
+        return true;
     }
     return false;
 }
