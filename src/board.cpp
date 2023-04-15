@@ -225,19 +225,25 @@ int Board::make_move(int column, int row, char move_type)
             if(masked_value == 'X')
             {
                 board_cells[row][column].setMaskedValue('F');
-                flagged_mines ++;
-                if(value == 9)
+                if(flagged_mines < mines)
                 {
-                    correctly_flagged ++;
+                    flagged_mines ++;
+                    if(value == 9)
+                    {
+                        correctly_flagged ++;
+                    }
                 }
             }
             else if(masked_value == 'F')
             {
                 board_cells[row][column].setMaskedValue('X');
-                flagged_mines --;
-                if(value == 9)
+                if(flagged_mines > 0)
                 {
-                    correctly_flagged --;
+                    flagged_mines --;
+                    if(value == 9)
+                    {
+                        correctly_flagged --;
+                    }
                 }
             }
         }
