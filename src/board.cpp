@@ -8,6 +8,7 @@ Board::Board(int columns, int rows, int mines)
     this->rows = rows;
     this->mines = mines;
     this->flagged_mines = 0;
+    this->correctly_flagged = 0;
 
     load_board_with_random_values(mines);
 }
@@ -224,17 +225,19 @@ int Board::make_move(int column, int row, char move_type)
             if(masked_value == 'X')
             {
                 board_cells[row][column].setMaskedValue('F');
+                flagged_mines ++;
                 if(value == 9)
                 {
-                    flagged_mines ++;
+                    correctly_flagged ++;
                 }
             }
             else if(masked_value == 'F')
             {
                 board_cells[row][column].setMaskedValue('X');
+                flagged_mines --;
                 if(value == 9)
                 {
-                    flagged_mines --;
+                    correctly_flagged --;
                 }
             }
         }
@@ -255,7 +258,6 @@ int Board::make_move(int column, int row, char move_type)
 
 bool Board::check_if_winning() const
 {
-    unsigned int correctly_flagged = 0;
     for(auto row: Board::board_cells)
     {
         for(auto cell: row)
@@ -263,10 +265,6 @@ bool Board::check_if_winning() const
             if(cell.getMaskedValue() == 'X')
             {
                 return false;
-            }
-            if(cell.getMaskedValue() == 'F' && cell.getValue() == 9)
-            {
-                correctly_flagged++;
             }
         }
     }

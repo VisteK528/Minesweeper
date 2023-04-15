@@ -8,8 +8,8 @@ class Board
 {
     private:
         std::vector<std::vector<Cell>> board_cells;
-        std::vector<std::vector<int>> selected_cells;
         unsigned int mines;
+        unsigned int correctly_flagged;
         unsigned int flagged_mines;
 
         int rows;
@@ -21,7 +21,7 @@ class Board
         void gameOverUncover(unsigned int row, unsigned int column);
 
     public:
-    Board(){};
+        Board(){};
         Board(int rows, int columns, int mines);
 
         std::vector<std::vector<Cell>> getBoard() const;
@@ -29,6 +29,8 @@ class Board
         void load_board_with_random_values(unsigned int mines);
         int make_move(int column, int row, char move_type);
         void display_board(int mode);
+
+        unsigned int getFlaggedMines() const {return flagged_mines;}
 };
 
 #endif
