@@ -42,22 +42,22 @@ void Cell::setMaskedValue(int masked_value)
     this->masked_value=masked_value;
 }
 
-int Cell::getX()
+int Cell::getX() const
 {
     return x;
 }
 
-int Cell::getY()
+int Cell::getY() const
 {
     return y;
 }
 
-int Cell::getValue()
+int Cell::getValue() const
 {
     return value;
 }
 
-int Cell::getMaskedValue()
+int Cell::getMaskedValue() const
 {
     return masked_value;
 }

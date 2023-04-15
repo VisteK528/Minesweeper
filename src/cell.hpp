@@ -7,16 +7,16 @@
 class Cell
 {
 private:
-    unsigned int x;
-    unsigned int y;
+    int x;
+    int y;
     int value;
     int masked_value;
 public:
     Cell(int x, int y, int value);
-    int getX();
-    int getY();
-    int getValue();
-    int getMaskedValue();
+    int getX() const;
+    int getY() const;
+    int getValue() const;
+    int getMaskedValue() const;
     void setX(int x);
     void setY(int y);
     void setValue(int value);

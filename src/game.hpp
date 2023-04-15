@@ -16,7 +16,6 @@ class Game
     private:
         // SFML variables
         std::unique_ptr<sf::RenderWindow> window;
-        sf::Event ev;
         void initWindow();
         void initVariables();
         bool game_on = true;

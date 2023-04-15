@@ -17,8 +17,9 @@ class Board
 
         //Methods
         unsigned int uncover(int column, int row);
+        bool check_if_uncoverable(int row, int column) const;
         bool check_if_winning() const;
-        void gameOverUncover(unsigned int row, unsigned int column);
+        void gameOverUncover(int row, int column);
 
     public:
         Board(){};

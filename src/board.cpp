@@ -40,7 +40,7 @@ void Board::load_board_with_random_values(unsigned int mines)
         std::vector<Cell> row;
         for(int j=0; j<columns; j++)
         {
-            row.push_back(Cell(i, j, 0));
+            row.push_back(Cell(j, i, 0));
         }
         board_cells.push_back(row);
     }
@@ -154,14 +154,17 @@ unsigned int Board::uncover(int row, int column)
     return unflagged_mines;
 }
 
-void Board::gameOverUncover(unsigned int row, unsigned int column)
+void Board::gameOverUncover(int row, int column)
 {
-    board_cells[row][column].setMaskedValue(111);   // Set game over mine field to 'o'
-    for(auto& row: board_cells)
+    for(auto& row_vect: board_cells)
     {
-        for(auto& cell: row)
+        for(auto& cell: row_vect)
         {
-            if(cell.getValue() == 9 && cell.getMaskedValue() == 88)
+            if((cell.getY() >= row-1 && cell.getY() <row+2 && cell.getX() >= column-1 && cell.getX() < column+2 && cell.getMaskedValue() == 9 && cell.getValue() == 9) || (cell.getY() == row && cell.getX() == column && cell.getMaskedValue() == 88 && cell.getValue() == 9))
+            {
+                cell.setMaskedValue(111);   // Set game over mine field to 'o'
+            }
+            else if(cell.getValue() == 9 && cell.getMaskedValue() == 88)
             {
                 cell.setMaskedValue(87);            // Set all remaining bombs fields to "W", (Went off)
             }
@@ -171,6 +174,26 @@ void Board::gameOverUncover(unsigned int row, unsigned int column)
             }
         }
     }
+}
+
+bool Board::check_if_uncoverable(int row, int column) const
+{
+    int flagged = 0;
+    for(int i=std::max(0, row-1); i<std::min(rows, row+2); i++)
+    {
+        for(int j=std::max(0, column-1); j<std::min(columns, column+2); j++)
+        {
+            if(board_cells[i][j].getMaskedValue() == 'F')
+            {
+                flagged++;
+            }
+        }
+    }
+    if(flagged == board_cells[row][column].getMaskedValue())
+    {
+        return true;
+    }
+    return false;
 }
 
 int Board::make_move(int column, int row, char move_type)
@@ -213,10 +236,13 @@ int Board::make_move(int column, int row, char move_type)
             }
             else
             {
-                if(uncover(row, column) > 0)
+                if(check_if_uncoverable(row, column))
                 {
-                    gameOverUncover(row, column);
-                    return 1;
+                    if(uncover(row, column) > 0)
+                    {
+                        gameOverUncover(row, column);
+                        return 1;
+                    }
                 }
             }
         }
