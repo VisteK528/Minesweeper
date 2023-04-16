@@ -43,12 +43,13 @@ void Game::renderSprites()
 
 void Game::loadTextures()
 {
+    image.loadFromFile("textures/textures.png");
     for(unsigned int i=0; i<5; i++)
     {
         for(unsigned int j=0; j<4; j++)
         {
             textures.push_back(std::make_shared<sf::Texture>());
-            (textures[textures.size()-1])->loadFromFile("textures/textures.png", sf::IntRect(j*tile_texture_size.first,i*tile_texture_size.second, tile_texture_size.first, tile_texture_size.second));
+            (textures[textures.size()-1])->loadFromImage(image, sf::IntRect(j*tile_texture_size.first,i*tile_texture_size.second, tile_texture_size.first, tile_texture_size.second));
         }
     }
 }

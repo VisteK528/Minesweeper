@@ -31,6 +31,7 @@ class Game
         int rows;
         int columns;
 
+        sf::Image image;
         sf::Texture my_texture;
         sf::Sprite my_sprite;
 
