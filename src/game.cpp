@@ -25,7 +25,7 @@ void Game::initVariables()
 
 void Game::initWindow()
 {
-    this->window = std::make_unique<sf::RenderWindow>(sf::VideoMode(width+250, height), "Minesweeper");
+    this->window = std::make_unique<sf::RenderWindow>(sf::VideoMode(width+350, height), "Minesweeper");
     window->setKeyRepeatEnabled(false);
 }
 
@@ -43,7 +43,17 @@ void Game::renderSprites()
 
 void Game::loadTextures()
 {
-    image.loadFromFile("textures/textures.png");
+    // Load texturemap
+    if(!image.loadFromFile("textures/textures.png"))
+    {
+        throw TexturesLoadingError("Unable to load textures!");
+    }
+
+    if(!font.loadFromFile("textures/mine-sweeper.ttf"))
+    {
+        throw FontLoadingError("Unable to load font!");
+    }
+
     for(unsigned int i=0; i<5; i++)
     {
         for(unsigned int j=0; j<4; j++)
@@ -110,22 +120,8 @@ void Game::runGraphics()
     updateBoard();
     window->setFramerateLimit(30);
 
-    sf::Font font;
-    font.loadFromFile("textures/Arial.ttf");
-    sf::Text duration_text;
-    sf::Text mines_text;
-
-    mines_text.setCharacterSize(25);
-    mines_text.setFillColor(sf::Color::Red);
-    mines_text.setString("Mines: 0/"+std::to_string(mines));
-    mines_text.setPosition(810.f, 10.f);
-    mines_text.setFont(font);
-
-    duration_text.setCharacterSize(20);
-    duration_text.setFillColor(sf::Color::Yellow);
-    duration_text.setString("Time elapsed: 00:00");
-    duration_text.setPosition(810.f, 50.f);
-    duration_text.setFont(font);
+    Text duration_text("Time elapsed: 00:00", font, 18, sf::Color::Yellow, sf::Vector2f(810.f, 50.f));
+    Text mines_text("Mines: 0/"+std::to_string(mines), font, 25, sf::Color::Blue, sf::Vector2f(810.f, 10.f));
 
     while(window->isOpen())
     {

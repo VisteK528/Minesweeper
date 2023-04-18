@@ -2,6 +2,7 @@
 #define GAME_HPP
 
 #include "board.hpp"
+#include "widgets.hpp"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
@@ -10,6 +11,7 @@
 #include <thread>
 #include <iomanip>
 #include <sstream>
+#include "exceptions.hpp"
 
 class Game
 {
@@ -33,6 +35,7 @@ class Game
 
         sf::Image image;
         sf::Texture my_texture;
+        sf::Font font;
         sf::Sprite my_sprite;
 
         std::vector<std::shared_ptr<sf::Texture>> textures;
