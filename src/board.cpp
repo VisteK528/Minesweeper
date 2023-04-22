@@ -196,7 +196,7 @@ bool Board::check_if_uncoverable(int row, int column) const
     return false;
 }
 
-int Board::make_move(int column, int row, char move_type)
+RESULTS Board::make_move(int column, int row, char move_type)
 {
     /*
         Move types:
@@ -231,7 +231,7 @@ int Board::make_move(int column, int row, char move_type)
                 else
                 {
                     gameOverUncover(row, column);
-                    return 1;   // Game over
+                    return GAME_OVER;   // Game over
                 }
             }
             else
@@ -241,7 +241,7 @@ int Board::make_move(int column, int row, char move_type)
                     if(uncover(row, column) > 0)
                     {
                         gameOverUncover(row, column);
-                        return 1;
+                        return GAME_OVER;
                     }
                 }
             }
@@ -275,16 +275,16 @@ int Board::make_move(int column, int row, char move_type)
         }
         if(check_if_winning())
         {
-            return 2;
+            return WIN;
         }
         else
         {
-            return 0;
+            return CARRY_ON;
         }
     }
     else
     {
-        return 5;   // Not valid move
+        return INVALID_INPUT;   // Not valid move
     }
 }
 

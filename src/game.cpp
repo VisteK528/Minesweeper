@@ -119,7 +119,7 @@ void Game::updateBoard()
 
 void Game::runGraphics()
 {
-    unsigned int result;
+    RESULTS result = CARRY_ON;
     updateBoard();
     window->setFramerateLimit(30);
 
@@ -199,7 +199,7 @@ void Game::runGraphics()
         char choice;
         switch(result)
         {
-            case 1:
+            case GAME_OVER:
                 std::cout<<"Game over!"<<std::endl;
                 std::cout<<"Do you want to play again? y/n: ";
                 std::cin>>choice;
@@ -213,16 +213,16 @@ void Game::runGraphics()
                     updateBoard();
                     moves = 0;
                 }
-                result = 0;
+                result = CARRY_ON;
                 break;
-            case 5:
+            case INVALID_INPUT:
                 std::cout<<"Invalid input!"<<std::endl;
                 std::cin.ignore();
                 std::cout<<"Press enter to continue...";
                 std::cin.ignore();
-                result = 0;
+                result = CARRY_ON;
                 break;
-            case 2:
+            case WIN:
                 std::cout<<"YOU WON!!!"<<std::endl;
                 std::cout<<"Do you want to play again? y/n: ";
                 std::cin>>choice;
@@ -236,7 +236,7 @@ void Game::runGraphics()
                     updateBoard();
                     moves = 0;
                 }
-                result = 0;
+                result = CARRY_ON;
                 break;
             default:
                 break;
