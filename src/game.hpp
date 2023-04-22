@@ -12,6 +12,7 @@
 #include <iomanip>
 #include <sstream>
 #include "exceptions.hpp"
+#include <math.h>
 
 class Game
 {
@@ -24,8 +25,17 @@ class Game
 
         //Size
         unsigned int height = 800;
-        unsigned int width = 800;
+        unsigned int width = 1150;
 
+        //unsigned int board_height = 800;
+        unsigned int board_width = 800;
+
+        float width_ratio = 0;
+        float height_ratio = 0;
+        double board_ratio = 0;
+
+        float tile_size = 0;
+        float position_size = 0;
         std::pair<unsigned int, unsigned int> tile_texture_size = {512, 512};
 
         // General variables

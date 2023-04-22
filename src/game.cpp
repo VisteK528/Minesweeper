@@ -21,11 +21,16 @@ Game::~Game()
 void Game::initVariables()
 {
     this->window = nullptr;
+    width_ratio = (float)width/height;
+    height_ratio = (float)height/width;
+    tile_size = board_width/columns;
+    position_size = tile_size;
+    board_ratio = (double)board_width/width;
 }
 
 void Game::initWindow()
 {
-    this->window = std::make_unique<sf::RenderWindow>(sf::VideoMode(width+350, height), "Minesweeper");
+    this->window = std::make_unique<sf::RenderWindow>(sf::VideoMode(width, height), "Minesweeper");
     window->setKeyRepeatEnabled(false);
 }
 
@@ -68,8 +73,7 @@ void Game::updateBoard()
 {
     // Load board
     auto my_board = board.getBoard();
-    float tile_size = width/columns;
-
+    board_sprites.clear();                  // BARDZO WAŻNA ZMIANA DO WPROWADZNIA!!!!
     for(int i = 0; i<rows; i++)
     {
         std::vector<std::shared_ptr<sf::Sprite>> row;
@@ -115,7 +119,6 @@ void Game::updateBoard()
 
 void Game::runGraphics()
 {
-    float tile_size = width/columns;
     unsigned int result;
     updateBoard();
     window->setFramerateLimit(30);
@@ -131,24 +134,46 @@ void Game::runGraphics()
         {
             if(e.type == sf::Event::Closed) window->close();
 
+            if(e.type == sf::Event::Resized)
+            {
+                sf::Vector2u window_size = window->getSize();
+                if((int)(window_size.y * width_ratio) < window_size.x)
+                {
+                        window_size.x = window_size.y * width_ratio;
+                        width = window_size.x;
+                }
+                else if ((int)(window_size.x * height_ratio) <= window_size.y)
+                {
+                    window_size.y = window_size.x * height_ratio;
+                    height = window_size.y;
+                }
+                board_width = board_ratio*window_size.x;
+                position_size = board_ratio*window_size.x/columns;
+                window->setSize(window_size);
+                updateBoard();
+            }
+
             if(e.type == sf::Event::MouseButtonReleased)
             {
                 moves++;
                 sf::Vector2i position = sf::Mouse::getPosition(*window);
-                int column_pos = (int)(position.x/tile_size);
-                int row_pos = (int)(position.y/tile_size);
-                if(e.mouseButton.button == sf::Mouse::Left)
+                int column_pos = (int)(position.x/position_size);
+                int row_pos = (int)(position.y/position_size);
+                if(0 <= column_pos && column_pos < columns && 0 <= row_pos && row_pos < rows)
                 {
-                    if(moves == 1)
+                    if(e.mouseButton.button == sf::Mouse::Left)
                     {
-                        start = std::chrono::high_resolution_clock::now();
+                        if(moves == 1)
+                        {
+                            start = std::chrono::high_resolution_clock::now();
+                        }
+                        result = board.make_move(column_pos, row_pos, '1');
                     }
-                    result = board.make_move(column_pos, row_pos, '1');
-                }
-                else if(e.mouseButton.button == sf::Mouse::Right)
-                {
-                    result = board.make_move(column_pos, row_pos, 'F');
-                    mines_text.setString("Mines: "+std::to_string(board.getFlaggedMines())+'/'+std::to_string(mines));
+                    else if(e.mouseButton.button == sf::Mouse::Right)
+                    {
+                        result = board.make_move(column_pos, row_pos, 'F');
+                        mines_text.setString("Mines: "+std::to_string(board.getFlaggedMines())+'/'+std::to_string(mines));
+                    }
                 }
                 updateBoard();
             }
