@@ -20,7 +20,7 @@ else
 	LIBS = $(LINUX_LIBS)
 endif
 
-compile:
+all:
 	${CXX} ${CXX_FLAGS} ${INCLUDES} ${SRC} main.cpp -o build/minesweeper ${LIBS}
 
 test:
