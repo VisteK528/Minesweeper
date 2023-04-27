@@ -25,7 +25,7 @@ void Game::initVariables()
     height_ratio = (float)height/width;
     tile_size = board_width/columns;
     position_size = tile_size;
-    board_ratio = (double)board_width/width;
+    board_ratio = {(double)board_width/(double)width, (double)board_height/(double)height};
 }
 
 void Game::initWindow()
@@ -73,13 +73,13 @@ void Game::updateBoard()
 {
     // Load board
     auto my_board = board.getBoard();
-    board_sprites.clear();                  // BARDZO WAŻNA ZMIANA DO WPROWADZNIA!!!!
+    board_sprites.clear();
     for(int i = 0; i<rows; i++)
     {
         std::vector<std::shared_ptr<sf::Sprite>> row;
-        for(int j =0; j<columns; j++)
+        for(int j = 0; j<columns; j++)
         {
-            unsigned int value = my_board[j][i].getMaskedValue();
+            unsigned int value = my_board[i][j].getMaskedValue();
             switch (value)
             {
             case 88:
@@ -109,8 +109,8 @@ void Game::updateBoard()
                 row.push_back(std::make_shared<sf::Sprite>(*textures[value+11]));;
             }
             row[row.size()-1]->setOrigin(0, 0);
-            row[row.size()-1]->setPosition(i*tile_size, j*tile_size);
-            row[row.size()-1]->setScale(tile_size/tile_texture_size.first, tile_size/tile_texture_size.second);
+            row[row.size()-1]->setPosition(window->mapPixelToCoords(sf::Vector2i{(int)(j*position_size), (int)(i*position_size)}, window->getView()));
+            row[row.size()-1]->setScale(position_size/tile_texture_size.first, position_size/tile_texture_size.second);
 
         }
         board_sprites.push_back(row);
@@ -121,39 +121,38 @@ void Game::runGraphics()
 {
     RESULTS result = CARRY_ON;
     updateBoard();
-    window->setFramerateLimit(30);
+    window->setFramerateLimit(60);
+    view = std::make_unique<sf::View>(window->getDefaultView());
 
     Text duration_text("Time elapsed: 00:00", font, 18, sf::Color::Yellow, sf::Vector2f(810.f, 50.f));
     Text mines_text("Mines: 0/"+std::to_string(mines), font, 25, sf::Color::Blue, sf::Vector2f(810.f, 10.f));
 
     while(window->isOpen())
     {
-        window->clear();
         sf::Event e;
         while(window->pollEvent(e))
         {
             if(e.type == sf::Event::Closed) window->close();
 
-            if(e.type == sf::Event::Resized)
+            //Resizing the window
+            else if(e.type == sf::Event::Resized)
             {
-                sf::Vector2u window_size = window->getSize();
-                if((int)(window_size.y * width_ratio) < int(window_size.x))
-                {
-                        window_size.x = window_size.y * width_ratio;
-                        width = window_size.x;
-                }
-                else if ((int)(window_size.x * height_ratio) <= int(window_size.y))
-                {
-                    window_size.y = window_size.x * height_ratio;
-                    height = window_size.y;
-                }
-                board_width = board_ratio*window_size.x;
-                position_size = board_ratio*window_size.x/columns;
-                window->setSize(window_size);
+                sf::Vector2f view_size = { static_cast<float>(e.size.width), static_cast<float>(e.size.height)};
+                view->setSize(view_size);
+                window->setView(*view);
+                sf::Vector2f size = view->getSize();
+
+                board_width = board_ratio.first*size.x;
+                board_height = board_ratio.second*size.y;
+
+                position_size = std::min(board_ratio.first*size.x/columns, board_ratio.second*size.y/rows);
                 updateBoard();
+
+                /*duration_text.setPosition(window->mapPixelToCoords(sf::Vector2i{point+10, 50}, window->getView()));
+                mines_text.setPosition(window->mapPixelToCoords(sf::Vector2i{point+10, 10}, window->getView()));*/
             }
 
-            if(e.type == sf::Event::MouseButtonReleased)
+            else if(e.type == sf::Event::MouseButtonReleased)
             {
                 moves++;
                 sf::Vector2i position = sf::Mouse::getPosition(*window);
@@ -176,6 +175,7 @@ void Game::runGraphics()
                     }
                 }
                 updateBoard();
+                board.display_board(0);
             }
         }
         if(game_on && moves != 0)
@@ -191,6 +191,7 @@ void Game::runGraphics()
         }
 
         // Rendering textures
+        window->clear();
         renderSprites();
         window->draw(mines_text);
         window->draw(duration_text);

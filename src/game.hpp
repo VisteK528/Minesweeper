@@ -21,20 +21,21 @@ class Game
     private:
         // SFML variables
         std::unique_ptr<sf::RenderWindow> window;
+        std::unique_ptr<sf::View> view;
         void initWindow();
         void initVariables();
         bool game_on = true;
 
         //Size
-        int height = 800;
-        int width = 1150;
+        unsigned int height = 800;
+        unsigned int width = 1150;
 
-        //unsigned int board_height = 800;
-        int board_width = 800;
+        unsigned int board_height = 800;
+        unsigned int board_width = 800;
 
         float width_ratio = 0;
         float height_ratio = 0;
-        double board_ratio = 0;
+        std::pair<double, double> board_ratio = {0, 0};
 
         float tile_size = 0;
         float position_size = 0;
