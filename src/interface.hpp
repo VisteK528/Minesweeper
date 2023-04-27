@@ -11,7 +11,7 @@ class Interface
     private:
         std::unique_ptr<sf::RenderWindow> window;
         sf::Font font;
-        std::unique_ptr<Text> title;
+        std::unique_ptr<ui::Text> title;
 
         int window_width = 1150;
         int window_height = 800;

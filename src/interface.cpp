@@ -13,7 +13,7 @@ void Interface::initVariables(){
     this->window = nullptr;
 
     // Title initialization
-    this->title = std::make_unique<Text>("Minesweeper", font, 70, sf::Color(25,99,100, 255), sf::Vector2f(200, 400));
+    this->title = std::make_unique<ui::Text>("Minesweeper", font, 70, sf::Color(25,99,100, 255), sf::Vector2f(575, 400), ui::ORIGIN::C);
 }
 
 void Interface::initWindow(){

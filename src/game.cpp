@@ -137,12 +137,12 @@ void Game::runGraphics()
             if(e.type == sf::Event::Resized)
             {
                 sf::Vector2u window_size = window->getSize();
-                if((int)(window_size.y * width_ratio) < window_size.x)
+                if((int)(window_size.y * width_ratio) < int(window_size.x))
                 {
                         window_size.x = window_size.y * width_ratio;
                         width = window_size.x;
                 }
-                else if ((int)(window_size.x * height_ratio) <= window_size.y)
+                else if ((int)(window_size.x * height_ratio) <= int(window_size.y))
                 {
                     window_size.y = window_size.x * height_ratio;
                     height = window_size.y;

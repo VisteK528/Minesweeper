@@ -14,6 +14,8 @@
 #include "exceptions.hpp"
 #include <math.h>
 
+using namespace ui;
+
 class Game
 {
     private:
@@ -24,11 +26,11 @@ class Game
         bool game_on = true;
 
         //Size
-        unsigned int height = 800;
-        unsigned int width = 1150;
+        int height = 800;
+        int width = 1150;
 
         //unsigned int board_height = 800;
-        unsigned int board_width = 800;
+        int board_width = 800;
 
         float width_ratio = 0;
         float height_ratio = 0;
