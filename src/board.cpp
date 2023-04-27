@@ -110,7 +110,7 @@ void Board::display_board(int mode)
             else
             {
                 int value = cell.getMaskedValue();
-                if(value == 88 || value == 70 || value == 111 || value == 87 || value == 73)
+                if(value == 88 || value == 70 || value == 111 || value == 87 || value == 73 || value == 63)
                 {
                     std::cout<<(char)value<<' ';
                 }
@@ -135,7 +135,7 @@ unsigned int Board::uncover(int row, int column)
     {
         for(int j = std::max(column-1,0); j<max_j; j++)
         {
-            if(board_cells[i][j].getMaskedValue() == 'X')
+            if(board_cells[i][j].getMaskedValue() == 'X' || board_cells[i][j].getMaskedValue() == '?')
             {
                 int value = board_cells[i][j].getValue();
                 char masked_value = board_cells[i][j].getMaskedValue();
@@ -160,7 +160,7 @@ void Board::gameOverUncover(int row, int column)
     {
         for(auto& cell: row_vect)
         {
-            if((cell.getY() >= row-1 && cell.getY() <row+2 && cell.getX() >= column-1 && cell.getX() < column+2 && cell.getMaskedValue() == 9 && cell.getValue() == 9) || (cell.getY() == row && cell.getX() == column && cell.getMaskedValue() == 88 && cell.getValue() == 9))
+            if((cell.getY() >= row-1 && cell.getY() <row+2 && cell.getX() >= column-1 && cell.getX() < column+2 && cell.getMaskedValue() == 9 && cell.getValue() == 9) || (cell.getY() == row && cell.getX() == column && (cell.getMaskedValue() == 88 || cell.getMaskedValue() == 63) && cell.getValue() == 9))
             {
                 cell.setMaskedValue(111);   // Set game over mine field to 'o'
             }
@@ -215,7 +215,7 @@ RESULTS Board::make_move(int column, int row, char move_type)
         char masked_value = board_cells[row][column].getMaskedValue();
         if(move_type=='1')
         {
-            if(masked_value == 'X')
+            if(masked_value == 'X' || masked_value == '?')
             {
                 if(value != 9)
                 {
@@ -260,9 +260,8 @@ RESULTS Board::make_move(int column, int row, char move_type)
                     }
                 }
             }
-            else if(masked_value == 'F')
-            {
-                board_cells[row][column].setMaskedValue('X');
+            else if(masked_value == 'F'){
+                board_cells[row][column].setMaskedValue('?');
                 if(flagged_mines > 0)
                 {
                     flagged_mines --;
@@ -271,6 +270,9 @@ RESULTS Board::make_move(int column, int row, char move_type)
                         correctly_flagged --;
                     }
                 }
+            }
+            else if(masked_value == '?'){
+                board_cells[row][column].setMaskedValue('X');
             }
         }
         if(check_if_winning())
