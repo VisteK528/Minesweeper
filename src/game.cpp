@@ -82,32 +82,30 @@ void Game::updateBoard()
             unsigned int value = my_board[i][j].getMaskedValue();
             switch (value)
             {
-            case 88:
+            case COVERED:
                 row.push_back(std::make_shared<sf::Sprite>(*textures[0]));
                 break;
-            case 70:
+            case FLAGGED:
                 row.push_back(std::make_shared<sf::Sprite>(*textures[4]));
                 break;
-            case 63:
+            case QUESTION:
                 row.push_back(std::make_shared<sf::Sprite>(*textures[5]));
                 break;
-            case 87:
+            case OTHER_EXPLODED:
                 row.push_back(std::make_shared<sf::Sprite>(*textures[8]));
                 break;
-            case 111:
+            case EXPLODED:
                 row.push_back(std::make_shared<sf::Sprite>(*textures[10]));
                 break;
-            case 73:
+            case INVALIDLY_FLAGGED:
                 row.push_back(std::make_shared<sf::Sprite>(*textures[9]));
                 break;
-            case 0:
+            case EMPTY:
                 row.push_back(std::make_shared<sf::Sprite>(*textures[11]));
                 break;
-
-            case 9:
+            case MINE:
                 row.push_back(std::make_shared<sf::Sprite>(*textures[8]));
                 break;
-
             default:
                 row.push_back(std::make_shared<sf::Sprite>(*textures[value+11]));;
             }
@@ -169,16 +167,15 @@ void Game::runGraphics()
                         {
                             start = std::chrono::high_resolution_clock::now();
                         }
-                        result = board.make_move(column_pos, row_pos, '1');
+                        result = board.makeMove(column_pos, row_pos, UNCOVER);
                     }
                     else if(e.mouseButton.button == sf::Mouse::Right)
                     {
-                        result = board.make_move(column_pos, row_pos, 'F');
+                        result = board.makeMove(column_pos, row_pos, FLAG);
                         mines_text.setString("Mines: "+std::to_string(board.getFlaggedMines())+'/'+std::to_string(mines));
                     }
                 }
                 updateBoard();
-                board.display_board(0);
             }
         }
         if(game_on && moves != 0)
@@ -213,7 +210,7 @@ void Game::runGraphics()
                 }
                 else
                 {
-                    board.load_board_with_random_values(mines);
+                    board.loadBoardWithRandomValues(mines);
                     updateBoard();
                     moves = 0;
                 }
@@ -236,7 +233,7 @@ void Game::runGraphics()
                 }
                 else
                 {
-                    board.load_board_with_random_values(mines);
+                    board.loadBoardWithRandomValues(mines);
                     updateBoard();
                     moves = 0;
                 }
@@ -265,10 +262,10 @@ void Game::run()
     while(game_on)
     {
         std::system("clear");
-        board.display_board(0);
+        board.displayBoard(0);
         int row = 0;
         int column = 0;
-        char move;
+        int move;
         std::cout<<"Row: ";
         std::cin>>row;
         std::cout<<"Column: ";
@@ -277,9 +274,9 @@ void Game::run()
         std::cin>>move;
         std::cout<<std::endl;
         std::cout<<std::endl;
-        result = board.make_move(column, row, move);
+        result = board.makeMove(column, row, static_cast<MOVES>(move));
         std::system("clear");
-        board.display_board(0);
+        board.displayBoard(0);
         std::cout<<std::endl;
         char choice;
         switch(result)
@@ -294,7 +291,7 @@ void Game::run()
                 }
                 else
                 {
-                    board.load_board_with_random_values(mines);
+                    board.loadBoardWithRandomValues(mines);
                 }
                 break;
             case 5:
