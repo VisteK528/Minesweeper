@@ -88,6 +88,9 @@ void Game::updateBoard()
             case 70:
                 row.push_back(std::make_shared<sf::Sprite>(*textures[4]));
                 break;
+            case 63:
+                row.push_back(std::make_shared<sf::Sprite>(*textures[5]));
+                break;
             case 87:
                 row.push_back(std::make_shared<sf::Sprite>(*textures[8]));
                 break;
