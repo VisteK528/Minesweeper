@@ -1,10 +1,12 @@
 #include "widgets.hpp"
 
+#include <utility>
+
 
 Text::Text(std::string text_str, sf::Font& font, unsigned int font_size, sf::Color color, sf::Vector2f position)
 {
     // Assign variables
-    setString(text_str);
+    setString(std::move(text_str));
     setFontSize(font_size);
     setFont(font);
     setTextColor(color);
