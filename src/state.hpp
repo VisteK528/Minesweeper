@@ -1,0 +1,31 @@
+//
+// Created by piotr on 4/29/23.
+//
+
+#ifndef MINESWEEPER_STATE_HPP
+#define MINESWEEPER_STATE_HPP
+
+#include <SFML/Graphics.hpp>
+#include <vector>
+#include <stack>
+#include <map>
+#include <memory>
+
+class State {
+protected:
+    std::shared_ptr<sf::RenderWindow> window;
+    std::vector<sf::Texture> textures;
+    bool quit;
+public:
+    State(std::shared_ptr<sf::RenderWindow> window);
+    virtual ~State();
+
+    virtual void updateKeybinds() = 0;
+    const bool& getQuit() const;
+    virtual void checkForQuit();
+    virtual void update() = 0;
+    virtual void render(std::shared_ptr<sf::RenderTarget> target = nullptr) = 0;
+};
+
+
+#endif //MINESWEEPER_STATE_HPP
