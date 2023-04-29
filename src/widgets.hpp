@@ -14,6 +14,7 @@ namespace ui{
     sf::Vector2f getOrigin(float width, float height, ORIGIN origin);
 
     class Text;
+    class Button;
 }
 
 class ui::Text: public sf::Drawable {
@@ -46,6 +47,49 @@ public:
 
     Text(std::string text_str, sf::Font &font, unsigned int size, sf::Color color, sf::Vector2f position,
          ORIGIN origin = NW);
+
+};
+
+class ui::Button: public sf::Drawable{
+private:
+    bool clicked;
+    sf::Vector2f origin_coords;
+public:
+    const sf::Vector2f &getPosition() const;
+
+    const sf::Vector2f &getRelativePosition() const;
+
+    const sf::Vector2f &getDimensions() const;
+
+    const std::pair<sf::Color, sf::Color> &getBackgroundColor() const;
+
+    const std::pair<sf::Color, sf::Color> &getTextColor() const;
+
+    const std::string &getTextStr() const;
+
+    const sf::Font &getFont() const;
+
+    unsigned int getFontSize() const;
+
+private:
+    sf::Vector2f position;
+    sf::Vector2f relative_position;
+    sf::Vector2f dimensions;
+    std::pair<sf::Color, sf::Color> background_color;
+    std::pair<sf::Color, sf::Color> text_color;
+    std::string text_str;
+    sf::Font font;
+    unsigned int font_size;
+
+    sf::Texture texture;
+    std::unique_ptr<ui::Text> text;
+    sf::RectangleShape shape;
+
+
+    void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
+public:
+    Button(std::string text_str, sf::Font &font, unsigned int size, std::pair<sf::Color, sf::Color> background_color, std::pair<sf::Color, sf::Color> text_color, sf::Vector2f position, sf::Vector2f dimensions, ORIGIN origin);
+    bool update(sf::Vector2f mouse_position);
 
 };
 #endif

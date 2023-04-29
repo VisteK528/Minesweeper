@@ -88,3 +88,82 @@ float ui::Text::getHeight() const
 {
     return this->text.getLocalBounds().height;
 }
+
+ui::Button::Button(std::string text_str, sf::Font &font, unsigned int size, std::pair<sf::Color, sf::Color> background_color, std::pair<sf::Color, sf::Color> text_color, sf::Vector2f position, sf::Vector2f dimensions, ORIGIN origin){
+    this->text_str = text_str;
+    this->font = font;
+    this->font_size = size;
+    this->background_color = background_color;
+    this->text_color = text_color;
+    this->dimensions = dimensions;
+    this->origin_coords = getOrigin(dimensions.x, dimensions.y, origin);
+    this->position = position;
+    this->relative_position = sf::Vector2f(position.x-origin_coords.x, position.y-origin_coords.y);
+    this->clicked = false;
+
+    shape.setSize(dimensions);
+    shape.setFillColor(background_color.first);
+    shape.setOrigin(origin_coords);
+    shape.setPosition(position);
+
+    this->text = std::make_unique<ui::Text>(text_str, font, font_size, text_color.first,sf::Vector2f(relative_position.x+dimensions.x/2, relative_position.y+dimensions.y/2), ui::ORIGIN::C);
+}
+
+bool ui::Button::update(sf::Vector2f mouse_position) {
+    if(mouse_position.x >= relative_position.x && mouse_position.x <= relative_position.x+dimensions.x && mouse_position.y >= relative_position.y && mouse_position.y <= relative_position.y+dimensions.y){
+        shape.setFillColor(background_color.second);
+        text->setTextColor(text_color.second);
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+            if(!clicked){
+                clicked = true;
+                return true;
+            }
+        }
+        else{
+            clicked = false;
+        }
+    }
+    else{
+        shape.setFillColor(background_color.first);
+        text->setTextColor(text_color.first);
+    }
+    return false;
+}
+
+void ui::Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
+    target.draw(shape, states);
+    target.draw(*text, states);
+}
+
+const sf::Vector2f &ui::Button::getPosition() const {
+    return position;
+}
+
+const sf::Vector2f &ui::Button::getRelativePosition() const {
+    return relative_position;
+}
+
+const sf::Vector2f &ui::Button::getDimensions() const {
+    return dimensions;
+}
+
+const std::pair<sf::Color, sf::Color> &ui::Button::getBackgroundColor() const {
+    return background_color;
+}
+
+const std::pair<sf::Color, sf::Color> &ui::Button::getTextColor() const {
+    return text_color;
+}
+
+const std::string &ui::Button::getTextStr() const {
+    return text_str;
+}
+
+const sf::Font &ui::Button::getFont() const {
+    return font;
+}
+
+unsigned int ui::Button::getFontSize() const {
+    return font_size;
+}
