@@ -113,19 +113,22 @@ bool ui::Button::update(sf::Vector2f mouse_position) {
     if(mouse_position.x >= relative_position.x && mouse_position.x <= relative_position.x+dimensions.x && mouse_position.y >= relative_position.y && mouse_position.y <= relative_position.y+dimensions.y){
         shape.setFillColor(background_color.second);
         text->setTextColor(text_color.second);
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-            if(!clicked){
-                clicked = true;
-                return true;
-            }
-        }
-        else{
-            clicked = false;
-        }
     }
     else{
         shape.setFillColor(background_color.first);
         text->setTextColor(text_color.first);
+    }
+
+    if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+        if(!clicked){
+            clicked = true;
+            if(mouse_position.x >= relative_position.x && mouse_position.x <= relative_position.x+dimensions.x && mouse_position.y >= relative_position.y && mouse_position.y <= relative_position.y+dimensions.y){
+                return true;
+            }
+        }
+    }
+    else{
+        clicked = false;
     }
     return false;
 }
