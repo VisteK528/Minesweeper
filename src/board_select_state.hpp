@@ -1,7 +1,3 @@
-//
-// Created by piotr on 4/30/23.
-//
-
 #ifndef MINESWEEPER_BOARD_SELECT_STATE_HPP
 #define MINESWEEPER_BOARD_SELECT_STATE_HPP
 
@@ -27,10 +23,9 @@ private:
 public:
     BoardSelectState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, sf::Font &font);
 
-    void init(){};
-    virtual void updateKeybinds();
-    virtual void update();
-    virtual void render(std::shared_ptr<sf::RenderTarget> target = nullptr);
+    void init() override {};
+    void update() override;
+    void render(std::shared_ptr<sf::RenderTarget> target) override;
 };
 
 #endif //MINESWEEPER_BOARD_SELECT_STATE_HPP

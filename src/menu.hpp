@@ -1,7 +1,3 @@
-//
-// Created by piotr on 4/29/23.
-//
-
 #ifndef MINESWEEPER_MENU_HPP
 #define MINESWEEPER_MENU_HPP
 
@@ -24,10 +20,9 @@ private:
 public:
     Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, sf::Font &font);
 
-    void init(){};
-    virtual void updateKeybinds();
-    virtual void update();
-    virtual void render(std::shared_ptr<sf::RenderTarget> target = nullptr);
+    void init() override {};
+    void update() override;
+    void render(std::shared_ptr<sf::RenderTarget> target) override;
 };
 
 

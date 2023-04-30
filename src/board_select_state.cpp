@@ -1,7 +1,3 @@
-//
-// Created by piotr on 4/30/23.
-//
-
 #include "board_select_state.hpp"
 
 BoardSelectState::BoardSelectState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>>states, sf::Font& font): State(window, states) {
@@ -36,12 +32,7 @@ void BoardSelectState::initVariables() {
     this->back = std::make_unique<ui::Button>("> Back", this->font, 20, background_color, text_color, sf::Vector2f(1125, 775), sf::Vector2f(200, 50), ui::ORIGIN::SE);
 }
 
-void BoardSelectState::updateKeybinds(){
-    this->checkForQuit();
-}
-
 void BoardSelectState::update(){
-    updateKeybinds();
     sf::Vector2f position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
 
     if(this->back->update(static_cast<sf::Vector2f>(position))){
@@ -60,7 +51,7 @@ void BoardSelectState::update(){
         states->top()->init();
     }
     if(this->custom->update(static_cast<sf::Vector2f>(position))){
-        states->push(std::make_unique<GameState>(this->window, this->states, 16, 16, 40));
+        states->push(std::make_unique<GameState>(this->window, this->states, 10, 6, 2));
         states->top()->init();
     }
 

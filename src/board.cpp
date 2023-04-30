@@ -2,7 +2,7 @@
 #include <iostream>
 #include <random>
 
-Board::Board(int columns, int rows, int mines){
+Board::Board(int rows, int columns, int mines){
     this->columns = columns;
     this->rows = rows;
     this->mines = mines;
@@ -164,17 +164,6 @@ bool Board::checkIfInsideRect(Cell cell, int row, int column) const{
 }
 
 RESULTS Board::makeMove(int column, int row, MOVES move_type){
-    /*
-        Move types:
-        1. Uncover
-        2. Flag
-
-        Returns:
-        1. 0 - game carries on
-        2. 1 - game over
-        3. 5 - not valid coordinates
-        4. 2 - game won
-    */
     if(0<=column && column < columns && 0 <= row && row < rows){
         int value = board_cells[row][column].getValue();
         char masked_value = board_cells[row][column].getMaskedValue();
@@ -202,8 +191,7 @@ RESULTS Board::makeMove(int column, int row, MOVES move_type){
                 }
             }
         }
-        else
-        {
+        else{
             if(masked_value == COVERED){
                 if(flagged_mines < mines){
                     board_cells[row][column].setMaskedValue(FLAGGED);
@@ -241,8 +229,7 @@ RESULTS Board::makeMove(int column, int row, MOVES move_type){
     }
 }
 
-bool Board::checkIfWinning() const
-{
+bool Board::checkIfWinning() const {
     for(const auto& row: Board::board_cells){
         for(auto cell: row){
             if(cell.getMaskedValue() == COVERED) return false;

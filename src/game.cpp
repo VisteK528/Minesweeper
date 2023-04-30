@@ -9,7 +9,9 @@ Game::Game() {
     this->window->setFramerateLimit(120);
     this->view = std::make_unique<sf::View>(window->getDefaultView());
     this->states = std::make_shared<std::stack<std::unique_ptr<State>>>();
-    this->font.loadFromFile("textures/mine-sweeper.ttf");
+    if(!this->font.loadFromFile("textures/mine-sweeper.ttf")){
+        throw TexturesLoadingError("Cannot load default font from file textures/mine-sweeper.ttf");
+    }
 
     pushState(std::make_unique<Menu>(this->window, this->states, this->font));
     this->states->top()->init();

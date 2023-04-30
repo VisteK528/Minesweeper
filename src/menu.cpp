@@ -1,7 +1,3 @@
-//
-// Created by piotr on 4/29/23.
-//
-
 #include "menu.hpp"
 
 Menu::Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, sf::Font& font): State(window, states) {
@@ -30,12 +26,7 @@ void Menu::initVariables() {
     this->exit = std::make_unique<ui::Button>("> Exit", this->font, 20, background_color, text_color, sf::Vector2f(575, 550), sf::Vector2f(200, 50), ui::ORIGIN::C);
 }
 
-void Menu::updateKeybinds(){
-    this->checkForQuit();
-}
-
 void Menu::update(){
-    updateKeybinds();
     sf::Vector2f position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
 
     if(this->start->update(position)){

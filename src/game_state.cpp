@@ -16,14 +16,21 @@ GameState::GameState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<s
     this->pause_btn = nullptr;
 
 
-    this->board = Board(columns, rows, mines);
+    this->board = Board(rows, columns, mines);
     this->initVariables();
 }
 
 void GameState::initVariables()
 {
-    position_size = board_width/columns;
+    position_size = std::min(board_width/columns, board_height/rows);
     board_ratio = {(double)board_width/(double)width, (double)board_height/(double)height};
+
+    if(columns > rows){
+        offset.y = (board_height - rows*position_size)/2;
+    }
+    else if(rows > columns){
+        offset.x = (board_width - columns*position_size)/2;
+    }
 }
 
 void GameState::renderSprites()
@@ -116,7 +123,7 @@ void GameState::updateBoard()
                     row.push_back(std::make_shared<sf::Sprite>(*textures[value+11]));
             }
             row[row.size()-1]->setOrigin(0, 0);
-            row[row.size()-1]->setPosition(window->mapPixelToCoords(sf::Vector2i{(int)(j*position_size), (int)(i*position_size)}, window->getView()));
+            row[row.size()-1]->setPosition(window->mapPixelToCoords(sf::Vector2i{offset.x+(int)(j*position_size), offset.y+(int)(i*position_size)}, window->getView()));
             row[row.size()-1]->setScale(position_size/tile_texture_size.first, position_size/tile_texture_size.second);
 
         }
@@ -125,7 +132,6 @@ void GameState::updateBoard()
 }
 
 void GameState::update() {
-    this->updateKeybinds();
     sf::Vector2f size = this->window->getView().getSize();
 
     board_width = board_ratio.first * size.x;
@@ -133,9 +139,9 @@ void GameState::update() {
     position_size = std::min(board_ratio.first * size.x / columns, board_ratio.second * size.y / rows);
 
     sf::Vector2i position = sf::Mouse::getPosition(*window);
-    int column_pos = (int)(position.x/position_size);
-    int row_pos = (int)(position.y/position_size);
-    if(0 <= column_pos && column_pos < columns && 0 <= row_pos && row_pos < rows && game_on)
+    sf::Vector2i mouse_board_coords = {int((position.x-offset.x)/position_size), int((position.y-offset.y)/position_size)};
+
+    if(0 <= mouse_board_coords.x && mouse_board_coords.x < columns && 0 <= mouse_board_coords.y && mouse_board_coords.y < rows && game_on)
     {
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
             if(!button_left_pressed){
@@ -146,7 +152,7 @@ void GameState::update() {
                 {
                     start = std::chrono::high_resolution_clock::now();
                 }
-                result = board.makeMove(column_pos, row_pos, UNCOVER);
+                result = board.makeMove(mouse_board_coords.x, mouse_board_coords.y, UNCOVER);
             }
 
         }
@@ -154,7 +160,7 @@ void GameState::update() {
             if(!button_right_pressed){
                 button_left_pressed = false;
                 button_right_pressed = true;
-                result = board.makeMove(column_pos, row_pos, FLAG);
+                result = board.makeMove(mouse_board_coords.x, mouse_board_coords.y, FLAG);
                 mines_info->setString("Mines: "+std::to_string(board.getFlaggedMines())+'/'+std::to_string(mines));
             }
         }
@@ -222,8 +228,4 @@ void GameState::render(std::shared_ptr<sf::RenderTarget> target) {
     target->draw(*change_difficulty_btn);
     target->draw(*play_again_btn);
     //target->draw(*pause_btn);
-}
-
-void GameState::updateKeybinds() {
-    this->checkForQuit();
 }

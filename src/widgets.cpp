@@ -1,9 +1,5 @@
 #include "widgets.hpp"
 
-#include <utility>
-
-// N, S, W, E, NW, NE, SW, SE, C
-
 sf::Vector2f ui::getOrigin(float width, float height, ORIGIN origin)
 {
     switch (origin) {
