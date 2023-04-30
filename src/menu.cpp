@@ -27,6 +27,7 @@ void Menu::updateKeybinds(){
 }
 
 void Menu::update(){
+    updateKeybinds();
     sf::Vector2i position = sf::Mouse::getPosition(*this->window);
 
     this->start->update(static_cast<sf::Vector2f>(position));

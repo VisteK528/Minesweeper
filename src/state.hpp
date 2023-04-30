@@ -20,6 +20,7 @@ public:
     State(std::shared_ptr<sf::RenderWindow> window);
     virtual ~State();
 
+    virtual void init() = 0;
     virtual void updateKeybinds() = 0;
     const bool& getQuit() const;
     virtual void checkForQuit();

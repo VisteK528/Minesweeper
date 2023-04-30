@@ -18,6 +18,8 @@ private:
     void initVariables();
 public:
     Menu(std::shared_ptr<sf::RenderWindow> window, sf::Font &font);
+
+    void init(){};
     virtual void updateKeybinds();
     virtual void update();
     virtual void render(std::shared_ptr<sf::RenderTarget> target = nullptr);

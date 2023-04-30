@@ -10,6 +10,7 @@
 #include <memory>
 #include "state.hpp"
 #include "menu.hpp"
+#include "game_state.hpp"
 
 class GameState;
 
@@ -17,6 +18,7 @@ class StateManager {
 private:
     std::stack<std::unique_ptr<State>> states;
     std::shared_ptr<sf::RenderWindow> window;
+    std::unique_ptr<sf::View> view;
     sf::Event e;
     sf::Font font;
 
