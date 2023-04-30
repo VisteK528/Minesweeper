@@ -53,6 +53,7 @@ private:
     void updateBoard();
     void renderSprites();
     void loadTextures();
+    void restart();
 
     // Other
     unsigned int moves;
@@ -64,8 +65,11 @@ private:
 
     std::unique_ptr<ui::Text> time_info;
     std::unique_ptr<ui::Text> mines_info;
+
+    std::unique_ptr<ui::Button> play_again;
+    std::unique_ptr<ui::Button> change_difficulty;
 public:
-    GameState(std::shared_ptr<sf::RenderWindow> window, int rows, int columns, int mines);
+    GameState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, int rows, int columns, int mines);
     virtual ~GameState(){};
 
     void init() override;

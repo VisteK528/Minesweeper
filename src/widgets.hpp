@@ -43,6 +43,9 @@ public:
 
     float getWidth() const;
 
+    /**@brief Function short description
+     *
+     * */
     float getHeight() const;
 
     Text(std::string text_str, sf::Font &font, unsigned int size, sf::Color color, sf::Vector2f position,

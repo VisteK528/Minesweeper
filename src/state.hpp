@@ -13,11 +13,12 @@
 
 class State {
 protected:
+    std::shared_ptr<std::stack<std::unique_ptr<State>>> states;
     std::shared_ptr<sf::RenderWindow> window;
     std::vector<sf::Texture> textures;
     bool quit;
 public:
-    State(std::shared_ptr<sf::RenderWindow> window);
+    State(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states);
     virtual ~State();
 
     virtual void init() = 0;

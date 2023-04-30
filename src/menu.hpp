@@ -7,6 +7,7 @@
 
 #include "widgets.hpp"
 #include "state.hpp"
+#include "board_select_state.hpp"
 
 class Menu: public State{
 private:
@@ -15,9 +16,13 @@ private:
     std::unique_ptr<ui::Button> exit;
     sf::Font font;
 
+    sf::Image background;
+    sf::Texture background_texture;
+    sf::RectangleShape background_rectangle;
+
     void initVariables();
 public:
-    Menu(std::shared_ptr<sf::RenderWindow> window, sf::Font &font);
+    Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, sf::Font &font);
 
     void init(){};
     virtual void updateKeybinds();

@@ -4,7 +4,7 @@
 
 #include "game_state.hpp"
 
-GameState::GameState(std::shared_ptr<sf::RenderWindow> window, int rows, int columns, int mines): State(window){
+GameState::GameState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, int rows, int columns, int mines): State(window, states){
     this->moves = 0;
     this->rows = rows;
     this->columns = columns;
@@ -56,8 +56,13 @@ void GameState::loadTextures()
 }
 
 void GameState::init() {
-    this->time_info = std::make_unique<ui::Text>("Time elapsed: 00:00", font, 18, sf::Color::Yellow, sf::Vector2f(810.f, 50.f));
+    std::pair<sf::Color, sf::Color> background_color = {sf::Color::Transparent, sf::Color::Transparent};
+    std::pair<sf::Color, sf::Color> text_color = {sf::Color::White, sf::Color::Red};
+
+    this->time_info = std::make_unique<ui::Text>("Time: 00:00", font, 18, sf::Color::Yellow, sf::Vector2f(810.f, 50.f));
     this->mines_info = std::make_unique<ui::Text>("Mines: 0/"+std::to_string(mines), font, 25, sf::Color::Blue, sf::Vector2f(810.f, 10.f));
+    this->play_again = std::make_unique<ui::Button>("> Play again", this->font, 10, background_color, text_color, sf::Vector2f(810, 450), sf::Vector2f(200, 50), ui::ORIGIN::C);
+    this->change_difficulty = std::make_unique<ui::Button>("> Change difficulty", this->font, 10, background_color, text_color, sf::Vector2f(810, 550), sf::Vector2f(200, 50), ui::ORIGIN::C);
     loadTextures();
     updateBoard();
 }
@@ -122,7 +127,7 @@ void GameState::update() {
     sf::Vector2i position = sf::Mouse::getPosition(*window);
     int column_pos = (int)(position.x/position_size);
     int row_pos = (int)(position.y/position_size);
-    if(0 <= column_pos && column_pos < columns && 0 <= row_pos && row_pos < rows)
+    if(0 <= column_pos && column_pos < columns && 0 <= row_pos && row_pos < rows && game_on)
     {
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
             if(!button_left_pressed){
@@ -151,6 +156,9 @@ void GameState::update() {
             button_right_pressed = false;
         }
     }
+    if(result != CARRY_ON){
+        game_on = false;
+    }
     updateBoard();
 
     if(game_on && moves != 0)
@@ -165,59 +173,32 @@ void GameState::update() {
 
     }
 
-    char choice;
-    switch(result)
-    {
-        case GAME_OVER:
-            std::cout<<"Game over!"<<std::endl;
-            std::cout<<"Do you want to play again? y/n: ";
-            std::cin>>choice;
-            if(choice == 'n')
-            {
-                game_on = false;
-                quit = true;
-            }
-            else
-            {
-                board.loadBoardWithRandomValues(mines);
-                updateBoard();
-                moves = 0;
-            }
-            result = CARRY_ON;
-            break;
-        case INVALID_INPUT:
-            std::cout<<"Invalid input!"<<std::endl;
-            std::cin.ignore();
-            std::cout<<"Press enter to continue...";
-            std::cin.ignore();
-            result = CARRY_ON;
-            break;
-        case WIN:
-            std::cout<<"YOU WON!!!"<<std::endl;
-            std::cout<<"Do you want to play again? y/n: ";
-            std::cin>>choice;
-            if(choice == 'n')
-            {
-                game_on = false;
-                quit=true;
-            }
-            else
-            {
-                board.loadBoardWithRandomValues(mines);
-                updateBoard();
-                moves = 0;
-            }
-            result = CARRY_ON;
-            break;
-        default:
-            break;
+    if(this->play_again->update(static_cast<sf::Vector2f>(position))){
+        restart();
     }
+    if(this->change_difficulty->update(static_cast<sf::Vector2f>(position))){
+        quit = true;
+    }
+
+}
+
+void GameState::restart() {
+    result = RESULTS::CARRY_ON;
+    this->time_info->setString("Time: 00:00");
+    this->mines_info->setString("Mines: 0/"+std::to_string(mines));
+    game_on = true;
+    moves = 0;
+    board.loadBoardWithRandomValues(mines);
 }
 
 void GameState::render(std::shared_ptr<sf::RenderTarget> target) {
     renderSprites();
     target->draw(*time_info);
     target->draw(*mines_info);
+    target->draw(*change_difficulty);
+    if(result != CARRY_ON){
+        target->draw(*play_again);
+    }
 
 }
 
