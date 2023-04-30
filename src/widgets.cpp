@@ -99,7 +99,7 @@ ui::Button::Button(std::string text_str, sf::Font &font, unsigned int size, std:
     this->origin_coords = getOrigin(dimensions.x, dimensions.y, origin);
     this->position = position;
     this->relative_position = sf::Vector2f(position.x-origin_coords.x, position.y-origin_coords.y);
-    this->clicked = false;
+    this->clicked = true;
 
     shape.setSize(dimensions);
     shape.setFillColor(background_color.first);
@@ -131,6 +131,17 @@ bool ui::Button::update(sf::Vector2f mouse_position) {
         clicked = false;
     }
     return false;
+}
+
+void ui::Button::setText(const std::string &textStr) {
+    text_str = textStr;
+    this->text->setString(textStr);
+}
+
+void ui::Button::setActive(bool active) {
+    if(!active){
+        this->shape.setFillColor(sf::Color(255, 255, 255, 255));
+    }
 }
 
 void ui::Button::draw(sf::RenderTarget& target, sf::RenderStates states) const

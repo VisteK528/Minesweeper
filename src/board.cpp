@@ -21,6 +21,9 @@ void Board::setBoard(std::vector<std::vector<Cell>> board){
 }
 
 void Board::loadBoardWithRandomValues(unsigned int mines) {
+    this->flagged_mines = 0;
+    this->correctly_flagged = 0;
+
     // Generating random numbers
     std::random_device rd;
     const uint_least32_t seed = rd();
@@ -202,12 +205,15 @@ RESULTS Board::makeMove(int column, int row, MOVES move_type){
         else
         {
             if(masked_value == COVERED){
-                board_cells[row][column].setMaskedValue(FLAGGED);
                 if(flagged_mines < mines){
+                    board_cells[row][column].setMaskedValue(FLAGGED);
                     flagged_mines ++;
                     if(value == MINE){
                         correctly_flagged ++;
                     }
+                }
+                else{
+                    board_cells[row][column].setMaskedValue(QUESTION);
                 }
             }
             else if(masked_value == FLAGGED){

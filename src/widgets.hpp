@@ -55,8 +55,27 @@ public:
 
 class ui::Button: public sf::Drawable{
 private:
+    bool active;
     bool clicked;
     sf::Vector2f origin_coords;
+
+    sf::Vector2f position;
+    sf::Vector2f relative_position;
+    sf::Vector2f dimensions;
+    std::pair<sf::Color, sf::Color> background_color;
+    std::pair<sf::Color, sf::Color> text_color;
+    std::string text_str;
+
+    sf::Font font;
+    unsigned int font_size;
+
+    sf::Texture texture;
+    std::unique_ptr<ui::Text> text;
+    sf::RectangleShape shape;
+
+
+    void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
+
 public:
     const sf::Vector2f &getPosition() const;
 
@@ -74,23 +93,9 @@ public:
 
     unsigned int getFontSize() const;
 
-private:
-    sf::Vector2f position;
-    sf::Vector2f relative_position;
-    sf::Vector2f dimensions;
-    std::pair<sf::Color, sf::Color> background_color;
-    std::pair<sf::Color, sf::Color> text_color;
-    std::string text_str;
-    sf::Font font;
-    unsigned int font_size;
+    void setText(const std::string &textStr);
+    void setActive(bool active=true);
 
-    sf::Texture texture;
-    std::unique_ptr<ui::Text> text;
-    sf::RectangleShape shape;
-
-
-    void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
-public:
     Button(std::string text_str, sf::Font &font, unsigned int size, std::pair<sf::Color, sf::Color> background_color, std::pair<sf::Color, sf::Color> text_color, sf::Vector2f position, sf::Vector2f dimensions, ORIGIN origin);
     bool update(sf::Vector2f mouse_position);
 

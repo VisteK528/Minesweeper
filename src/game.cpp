@@ -6,9 +6,11 @@
 
 Game::Game() {
     this->window = std::make_shared<sf::RenderWindow>(sf::VideoMode(1150, 800), "Minesweeper");
+    this->window->setFramerateLimit(120);
     this->view = std::make_unique<sf::View>(window->getDefaultView());
     this->states = std::make_shared<std::stack<std::unique_ptr<State>>>();
     this->font.loadFromFile("textures/mine-sweeper.ttf");
+
     pushState(std::make_unique<Menu>(this->window, this->states, this->font));
     this->states->top()->init();
 }
@@ -20,13 +22,6 @@ Game::~Game() {
 }
 void Game::pushState(std::unique_ptr<State> state) {
     this->states->push(std::move(state));
-}
-
-void Game::popState() {
-    if(!states->empty()){
-        states->top();
-        states->pop();
-    }
 }
 
 void Game::render() {
@@ -47,6 +42,9 @@ void Game::update() {
                 this->states->top()->init();
             }
         }
+    }
+    else{
+        window->close();
     }
 }
 

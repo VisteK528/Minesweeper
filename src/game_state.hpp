@@ -31,7 +31,6 @@ private:
 
     std::pair<double, double> board_ratio = {0, 0};
 
-    float tile_size = 0;
     float position_size = 0;
     std::pair<unsigned int, unsigned int> tile_texture_size = {512, 512};
 
@@ -39,6 +38,7 @@ private:
     int mines;
     int rows;
     int columns;
+    unsigned int moves;
 
     sf::Image image;
     sf::Texture my_texture;
@@ -55,9 +55,6 @@ private:
     void loadTextures();
     void restart();
 
-    // Other
-    unsigned int moves;
-
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
     std::chrono::time_point<std::chrono::high_resolution_clock> stop;
     std::chrono::minutes duration_m;
@@ -66,8 +63,9 @@ private:
     std::unique_ptr<ui::Text> time_info;
     std::unique_ptr<ui::Text> mines_info;
 
-    std::unique_ptr<ui::Button> play_again;
-    std::unique_ptr<ui::Button> change_difficulty;
+    std::unique_ptr<ui::Button> play_again_btn;
+    std::unique_ptr<ui::Button> change_difficulty_btn;
+    std::unique_ptr<ui::Button> pause_btn;
 public:
     GameState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, int rows, int columns, int mines);
     virtual ~GameState(){};

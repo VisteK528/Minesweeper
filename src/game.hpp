@@ -22,17 +22,19 @@ private:
     sf::Event e;
     sf::Font font;
 
+    unsigned int width = 1150;
+    unsigned int height = 800;
+
+    const sf::Vector2u min_dimensions = {575, 400};
+
     void pushState(std::unique_ptr<State> state);
-    void popState();
-    /*void changeState(std::unique_ptr<State> state);
-    std::unique_ptr<State> peekState();*/
+    void updateSFMLEvents();
+    void update();
+    void render();
 
 public:
     Game();
     ~Game();
-    void updateSFMLEvents();
-    void update();
-    void render();
     void run();
 
 };

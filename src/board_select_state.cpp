@@ -42,7 +42,7 @@ void BoardSelectState::updateKeybinds(){
 
 void BoardSelectState::update(){
     updateKeybinds();
-    sf::Vector2i position = sf::Mouse::getPosition(*this->window);
+    sf::Vector2f position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
 
     if(this->back->update(static_cast<sf::Vector2f>(position))){
         quit= true;

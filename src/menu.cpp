@@ -36,12 +36,12 @@ void Menu::updateKeybinds(){
 
 void Menu::update(){
     updateKeybinds();
-    sf::Vector2i position = sf::Mouse::getPosition(*this->window);
+    sf::Vector2f position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
 
-    if(this->start->update(static_cast<sf::Vector2f>(position))){
+    if(this->start->update(position)){
         this->states->push(std::make_unique<BoardSelectState>(this->window, this->states, this->font));
     }
-    else if(this->exit->update(static_cast<sf::Vector2f>(position))){
+    else if(this->exit->update(position)){
         quit = true;
     }
 }

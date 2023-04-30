@@ -9,6 +9,12 @@ GameState::GameState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<s
     this->rows = rows;
     this->columns = columns;
     this->mines = mines;
+    this->mines_info = nullptr;
+    this->time_info = nullptr;
+    this->play_again_btn = nullptr;
+    this->change_difficulty_btn = nullptr;
+    this->pause_btn = nullptr;
+
 
     this->board = Board(columns, rows, mines);
     this->initVariables();
@@ -16,8 +22,7 @@ GameState::GameState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<s
 
 void GameState::initVariables()
 {
-    tile_size = board_width/columns;
-    position_size = tile_size;
+    position_size = board_width/columns;
     board_ratio = {(double)board_width/(double)width, (double)board_height/(double)height};
 }
 
@@ -56,14 +61,17 @@ void GameState::loadTextures()
 }
 
 void GameState::init() {
-    std::pair<sf::Color, sf::Color> background_color = {sf::Color::Transparent, sf::Color::Transparent};
+    loadTextures();
+    std::pair<sf::Color, sf::Color> background_color = {sf::Color::Blue, sf::Color::Transparent};
     std::pair<sf::Color, sf::Color> text_color = {sf::Color::White, sf::Color::Red};
 
     this->time_info = std::make_unique<ui::Text>("Time: 00:00", font, 18, sf::Color::Yellow, sf::Vector2f(810.f, 50.f));
     this->mines_info = std::make_unique<ui::Text>("Mines: 0/"+std::to_string(mines), font, 25, sf::Color::Blue, sf::Vector2f(810.f, 10.f));
-    this->play_again = std::make_unique<ui::Button>("> Play again", this->font, 10, background_color, text_color, sf::Vector2f(810, 450), sf::Vector2f(200, 50), ui::ORIGIN::C);
-    this->change_difficulty = std::make_unique<ui::Button>("> Change difficulty", this->font, 10, background_color, text_color, sf::Vector2f(810, 550), sf::Vector2f(200, 50), ui::ORIGIN::C);
-    loadTextures();
+
+    this->play_again_btn = std::make_unique<ui::Button>("> Start over", font, 15, background_color, text_color, sf::Vector2f(810, 500), sf::Vector2f(200, 50), ui::ORIGIN::NW);
+    this->change_difficulty_btn = std::make_unique<ui::Button>("> Change difficulty", this->font, 15, background_color, text_color, sf::Vector2f(810, 575), sf::Vector2f(300, 50), ui::ORIGIN::NW);
+    //this->pause_btn = std::make_unique<ui::Button>("> Pause", this->font, 15, background_color, text_color, sf::Vector2f(810, 650), sf::Vector2f(200, 50), ui::ORIGIN::NW);
+    //this->pause_btn->setActive(false);
     updateBoard();
 }
 
@@ -105,7 +113,7 @@ void GameState::updateBoard()
                     row.push_back(std::make_shared<sf::Sprite>(*textures[8]));
                     break;
                 default:
-                    row.push_back(std::make_shared<sf::Sprite>(*textures[value+11]));;
+                    row.push_back(std::make_shared<sf::Sprite>(*textures[value+11]));
             }
             row[row.size()-1]->setOrigin(0, 0);
             row[row.size()-1]->setPosition(window->mapPixelToCoords(sf::Vector2i{(int)(j*position_size), (int)(i*position_size)}, window->getView()));
@@ -144,7 +152,6 @@ void GameState::update() {
         }
         else if(sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
             if(!button_right_pressed){
-                moves++;
                 button_left_pressed = false;
                 button_right_pressed = true;
                 result = board.makeMove(column_pos, row_pos, FLAG);
@@ -158,6 +165,7 @@ void GameState::update() {
     }
     if(result != CARRY_ON){
         game_on = false;
+        this->play_again_btn->setText("> Play again");
     }
     updateBoard();
 
@@ -173,12 +181,26 @@ void GameState::update() {
 
     }
 
-    if(this->play_again->update(static_cast<sf::Vector2f>(position))){
+    //Relative position after view change
+    sf::Vector2f corrected_position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
+
+    if(this->play_again_btn->update(corrected_position)){
         restart();
     }
-    if(this->change_difficulty->update(static_cast<sf::Vector2f>(position))){
+    if(this->change_difficulty_btn->update(corrected_position)){
         quit = true;
     }
+
+    /*if(this->pause_btn->update(corrected_position)){
+        if(game_on){
+            game_on = false;
+            this->pause_btn->setText("> Resume");
+        }
+        else{
+            game_on = true;
+            this->pause_btn->setText("> Pause");
+        }
+    }*/
 
 }
 
@@ -186,6 +208,8 @@ void GameState::restart() {
     result = RESULTS::CARRY_ON;
     this->time_info->setString("Time: 00:00");
     this->mines_info->setString("Mines: 0/"+std::to_string(mines));
+    this->play_again_btn->setText("> Start over");
+    //this->pause_btn->setText("> Pause");
     game_on = true;
     moves = 0;
     board.loadBoardWithRandomValues(mines);
@@ -195,11 +219,9 @@ void GameState::render(std::shared_ptr<sf::RenderTarget> target) {
     renderSprites();
     target->draw(*time_info);
     target->draw(*mines_info);
-    target->draw(*change_difficulty);
-    if(result != CARRY_ON){
-        target->draw(*play_again);
-    }
-
+    target->draw(*change_difficulty_btn);
+    target->draw(*play_again_btn);
+    //target->draw(*pause_btn);
 }
 
 void GameState::updateKeybinds() {
