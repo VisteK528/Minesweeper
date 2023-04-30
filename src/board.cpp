@@ -2,30 +2,29 @@
 #include <iostream>
 #include <random>
 
-Board::Board(int columns, int rows, int mines)
-{
+Board::Board(int rows, int columns, int mines){
     this->columns = columns;
     this->rows = rows;
     this->mines = mines;
     this->flagged_mines = 0;
     this->correctly_flagged = 0;
 
-    load_board_with_random_values(mines);
+    loadBoardWithRandomValues(mines);
 }
 
-std::vector<std::vector<Cell>> Board::getBoard() const
-{
+std::vector<std::vector<Cell>> Board::getBoard() const{
     return this->board_cells;
 }
 
-void Board::setBoard(std::vector<std::vector<Cell>> board)
-{
+void Board::setBoard(std::vector<std::vector<Cell>> board){
     this->board_cells = board;
 }
 
-void Board::load_board_with_random_values(unsigned int mines)
-{
-    // Generowanie losowych liczb
+void Board::loadBoardWithRandomValues(unsigned int mines) {
+    this->flagged_mines = 0;
+    this->correctly_flagged = 0;
+
+    // Generating random numbers
     std::random_device rd;
     const uint_least32_t seed = rd();
     std::mt19937 generator(seed);
@@ -35,42 +34,32 @@ void Board::load_board_with_random_values(unsigned int mines)
     board_cells.clear();
 
     // Init board
-    for(int i=0; i<rows; i++)
-    {
+    for(int i=0; i<rows; i++){
         std::vector<Cell> row;
-        for(int j=0; j<columns; j++)
-        {
-            row.push_back(Cell(j, i, 0));
+        for(int j=0; j<columns; j++){
+            row.push_back(Cell(j, i, EMPTY));
         }
         board_cells.push_back(row);
     }
 
     // Add mines
-    while(mines > 0)
-    {
+    while(mines > 0){
         int row = rows_index(generator);
         int column = columns_index(generator);
-        if(board_cells[row][column].getValue() != 9)
-        {
-            board_cells[row][column].setValue(9);
+        if(board_cells[row][column].getValue() != MINE){
+            board_cells[row][column].setValue(MINE);
             mines--;
         }
     }
 
     // Count mines
-    for(int i=0; i<rows; i++)
-    {
-        for(int j=0; j<columns; j++)
-        {
-            if(board_cells[i][j].getValue() != 9)
-            {
+    for(int i=0; i<rows; i++){
+        for(int j=0; j<columns; j++){
+            if(board_cells[i][j].getValue() != MINE){
                 int mines = 0;
-                for(int n=std::max(0,i-1); n<std::min(i+2, rows); n++)
-                {
-                    for(int k=std::max(0, j-1); k<std::min(j+2, columns); k++)
-                    {
-                        if(board_cells[n][k].getValue()==9)
-                        {
+                for(int n=std::max(0,i-1); n<std::min(i+2, rows); n++){
+                    for(int k=std::max(0, j-1); k<std::min(j+2, columns); k++){
+                        if(board_cells[n][k].getValue()==MINE){
                             mines++;
                         }
                     }
@@ -81,41 +70,31 @@ void Board::load_board_with_random_values(unsigned int mines)
     }
 }
 
-void Board::display_board(int mode)
-{
+void Board::displayBoard(int mode) {
     int i = 0;
     std::cout<<"    ";
-    for(int j = 0; j < columns; j++)
-    {
+    for(int j = 0; j < columns; j++){
         std::cout<<j%10<<' ';
     }
     std::cout<<std::endl;
     std::cout<<std::endl;
-    for(auto row: Board::board_cells)
-    {
-        if(i < 10)
-        {
+    for(const auto& row: Board::board_cells){
+        if(i < 10){
             std::cout<<i<<"   ";
         }
-        else
-        {
+        else{
             std::cout<<i<<"  ";
         }
-        for(auto cell: row)
-        {
-            if(mode==1)
-            {
+        for(const auto& cell: row){
+            if(mode==1){
                 std::cout<<cell.getValue()<<' ';
             }
-            else
-            {
+            else{
                 int value = cell.getMaskedValue();
-                if(value == 88 || value == 70 || value == 111 || value == 87 || value == 73)
-                {
+                if(value == COVERED || value == FLAGGED || value == EXPLODED || value == OTHER_EXPLODED || value == INVALIDLY_FLAGGED || value == QUESTION){
                     std::cout<<(char)value<<' ';
                 }
-                else
-                {
+                else{
                     std::cout<<value<<' ';
                 }
             }
@@ -125,27 +104,21 @@ void Board::display_board(int mode)
     }
 }
 
-unsigned int Board::uncover(int row, int column)
-{
+unsigned int Board::uncover(int row, int column){
     int unflagged_mines = 0;
     int max_i = std::min(row+2, rows);
     int max_j = std::min(column+2, columns);
 
-    for(int i = std::max(row-1, 0); i<max_i; i++)
-    {
-        for(int j = std::max(column-1,0); j<max_j; j++)
-        {
-            if(board_cells[i][j].getMaskedValue() == 'X')
-            {
+    for(int i = std::max(row-1, 0); i<max_i; i++){
+        for(int j = std::max(column-1,0); j<max_j; j++){
+            if(board_cells[i][j].getMaskedValue() == COVERED || board_cells[i][j].getMaskedValue() == QUESTION){
                 int value = board_cells[i][j].getValue();
                 char masked_value = board_cells[i][j].getMaskedValue();
                 board_cells[i][j].setMaskedValue(value);
-                if(value == 9 && masked_value != 'F')
-                {
+                if(value == MINE && masked_value != FLAGGED){
                     unflagged_mines++;
                 }
-                else if(value == 0)
-                {
+                else if(value == EMPTY){
                     uncover(i, j);
                 }
             }
@@ -154,155 +127,114 @@ unsigned int Board::uncover(int row, int column)
     return unflagged_mines;
 }
 
-void Board::gameOverUncover(int row, int column)
-{
-    for(auto& row_vect: board_cells)
-    {
-        for(auto& cell: row_vect)
-        {
-            if((cell.getY() >= row-1 && cell.getY() <row+2 && cell.getX() >= column-1 && cell.getX() < column+2 && cell.getMaskedValue() == 9 && cell.getValue() == 9) || (cell.getY() == row && cell.getX() == column && cell.getMaskedValue() == 88 && cell.getValue() == 9))
-            {
-                cell.setMaskedValue(111);   // Set game over mine field to 'o'
+void Board::gameOverUncover(int row, int column){
+    for(auto& row_vect: board_cells){
+        for(auto& cell: row_vect){
+            if((checkIfInsideRect(cell, row, column) && cell.getMaskedValue() == MINE && cell.getValue() == MINE) || (cell.getY() == row && cell.getX() == column && (cell.getMaskedValue() == COVERED || cell.getMaskedValue() == QUESTION) && cell.getValue() == MINE)){
+                cell.setMaskedValue(EXPLODED);           // Set game over mine field to 'o'
             }
-            else if(cell.getValue() == 9 && cell.getMaskedValue() == 88)
-            {
-                cell.setMaskedValue(87);            // Set all remaining bombs fields to "W", (Went off)
+            else if(cell.getValue() == MINE && cell.getMaskedValue() == COVERED){
+                cell.setMaskedValue(OTHER_EXPLODED);            // Set all remaining bombs fields to "W", (Went off)
             }
-            else if(cell.getMaskedValue() == 70 && cell.getValue() != 9)
-            {
-                cell.setMaskedValue(73);            // Set all invalidly flagged bombs to "I", (Invalid)
+            else if(cell.getMaskedValue() == FLAGGED && cell.getValue() != MINE){
+                cell.setMaskedValue(INVALIDLY_FLAGGED);            // Set all invalidly flagged bombs to "I", (Invalid)
             }
         }
     }
 }
 
-bool Board::check_if_uncoverable(int row, int column) const
-{
+bool Board::checkIfUncoverable(int row, int column) const{
     int flagged = 0;
-    for(int i=std::max(0, row-1); i<std::min(rows, row+2); i++)
-    {
-        for(int j=std::max(0, column-1); j<std::min(columns, column+2); j++)
-        {
-            if(board_cells[i][j].getMaskedValue() == 'F')
-            {
+    for(int i=std::max(0, row-1); i<std::min(rows, row+2); i++){
+        for(int j=std::max(0, column-1); j<std::min(columns, column+2); j++){
+            if(board_cells[i][j].getMaskedValue() == FLAGGED){
                 flagged++;
             }
         }
     }
-    if(flagged == board_cells[row][column].getMaskedValue())
-    {
-        return true;
-    }
+    if(flagged == board_cells[row][column].getMaskedValue()) return true;
     return false;
 }
 
-RESULTS Board::make_move(int column, int row, char move_type)
-{
-    /*
-        Move types:
-        1. Uncover
-        2. Flag
+bool Board::checkIfInsideRect(Cell cell, int row, int column) const{
+    int y = cell.getY();
+    int x = cell.getX();
+    if(y >= row-1 && y < row + 2 && x >= column -1 && x < column+2) return true;
+    return false;
+}
 
-        Returns:
-        1. 0 - game carries on
-        2. 1 - game over
-        3. 5 - not valid coordinates
-        4. 2 - game won
-    */
-    if(0<=column && column < columns && 0 <= row && row < rows)
-    {
+RESULTS Board::makeMove(int column, int row, MOVES move_type){
+    if(0<=column && column < columns && 0 <= row && row < rows){
         int value = board_cells[row][column].getValue();
         char masked_value = board_cells[row][column].getMaskedValue();
-        if(move_type=='1')
-        {
-            if(masked_value == 'X')
-            {
-                if(value != 9)
-                {
-                    if(value == 0)
-                    {
+        if(move_type==UNCOVER){
+            if(masked_value == COVERED || masked_value == QUESTION){
+                if(value != MINE){
+                    if(value == EMPTY){
                         uncover(row, column);
                     }
-                    else
-                    {
+                    else{
                         board_cells[row][column].setMaskedValue(value);
                     }
                 }
-                else
-                {
+                else{
                     gameOverUncover(row, column);
                     return GAME_OVER;   // Game over
                 }
             }
-            else
-            {
-                if(check_if_uncoverable(row, column))
-                {
-                    if(uncover(row, column) > 0)
-                    {
+            else{
+                if(checkIfUncoverable(row, column)){
+                    if(uncover(row, column) > 0){
                         gameOverUncover(row, column);
                         return GAME_OVER;
                     }
                 }
             }
         }
-        else
-        {
-            if(masked_value == 'X')
-            {
-                board_cells[row][column].setMaskedValue('F');
-                if(flagged_mines < mines)
-                {
+        else{
+            if(masked_value == COVERED){
+                if(flagged_mines < mines){
+                    board_cells[row][column].setMaskedValue(FLAGGED);
                     flagged_mines ++;
-                    if(value == 9)
-                    {
+                    if(value == MINE){
                         correctly_flagged ++;
                     }
                 }
+                else{
+                    board_cells[row][column].setMaskedValue(QUESTION);
+                }
             }
-            else if(masked_value == 'F')
-            {
-                board_cells[row][column].setMaskedValue('X');
-                if(flagged_mines > 0)
-                {
+            else if(masked_value == FLAGGED){
+                board_cells[row][column].setMaskedValue(QUESTION);
+                if(flagged_mines > 0){
                     flagged_mines --;
-                    if(value == 9)
-                    {
+                    if(value == MINE){
                         correctly_flagged --;
                     }
                 }
             }
+            else if(masked_value == QUESTION){
+                board_cells[row][column].setMaskedValue(COVERED);
+            }
         }
-        if(check_if_winning())
-        {
+        if(checkIfWinning()){
             return WIN;
         }
-        else
-        {
+        else{
             return CARRY_ON;
         }
     }
-    else
-    {
+    else{
         return INVALID_INPUT;   // Not valid move
     }
 }
 
-bool Board::check_if_winning() const
-{
-    for(auto row: Board::board_cells)
-    {
-        for(auto cell: row)
-        {
-            if(cell.getMaskedValue() == 'X')
-            {
-                return false;
-            }
+bool Board::checkIfWinning() const {
+    for(const auto& row: Board::board_cells){
+        for(auto cell: row){
+            if(cell.getMaskedValue() == COVERED) return false;
         }
     }
-    if(correctly_flagged == flagged_mines && correctly_flagged == mines)
-    {
-        return true;
-    }
+    if(correctly_flagged == flagged_mines && correctly_flagged == mines) return true;
     return false;
 }

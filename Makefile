@@ -1,5 +1,5 @@
 CXX = g++
-CXX_FLAGS = -Wall -std=c++20
+CXX_FLAGS = -g -Wall -std=c++20
 
 OS := $(shell uname)
 
