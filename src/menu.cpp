@@ -22,8 +22,8 @@ void Menu::initVariables() {
 
 
     this->title = std::make_unique<ui::Text>("Minesweeper", font, 70, sf::Color(255,255,255, 255), sf::Vector2f(575, 300), ui::ORIGIN::C);
-    this->start = std::make_unique<ui::Button>("> Start", this->font, 20, background_color, text_color, sf::Vector2f(575, 450), sf::Vector2f(200, 50), ui::ORIGIN::C);
-    this->exit = std::make_unique<ui::Button>("> Exit", this->font, 20, background_color, text_color, sf::Vector2f(575, 550), sf::Vector2f(200, 50), ui::ORIGIN::C);
+    this->start = std::make_unique<ui::Button>("> Start", this->font, 30, background_color, text_color, sf::Vector2f(575, 450), sf::Vector2f(190, 50), ui::ORIGIN::C);
+    this->exit = std::make_unique<ui::Button>("> Exit", this->font, 30, background_color, text_color, sf::Vector2f(575, 550), sf::Vector2f(155, 50), ui::ORIGIN::C);
 }
 
 void Menu::update(){
