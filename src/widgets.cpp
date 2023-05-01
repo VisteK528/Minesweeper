@@ -134,11 +134,11 @@ void ui::Button::setText(const std::string &textStr) {
     this->text->setString(textStr);
 }
 
-void ui::Button::setActive(bool active) {
+/*void ui::Button::setActive(bool active) {
     if(!active){
         this->shape.setFillColor(sf::Color(255, 255, 255, 255));
     }
-}
+}*/
 
 void ui::Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {

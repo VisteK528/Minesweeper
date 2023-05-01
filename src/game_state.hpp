@@ -12,6 +12,8 @@
 #include "widgets.hpp"
 #include <iostream>
 #include <iomanip>
+#include <sstream>
+#include <SFML/Graphics.hpp>
 
 class GameState: public State{
 private:

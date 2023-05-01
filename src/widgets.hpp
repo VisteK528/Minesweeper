@@ -55,7 +55,7 @@ public:
 
 class ui::Button: public sf::Drawable{
 private:
-    bool active;
+    //bool active;
     bool clicked;
     sf::Vector2f origin_coords;
 
@@ -94,7 +94,7 @@ public:
     unsigned int getFontSize() const;
 
     void setText(const std::string &textStr);
-    void setActive(bool active=true);
+    //void setActive(bool active=true);
 
     Button(std::string text_str, sf::Font &font, unsigned int size, std::pair<sf::Color, sf::Color> background_color, std::pair<sf::Color, sf::Color> text_color, sf::Vector2f position, sf::Vector2f dimensions, ORIGIN origin);
     bool update(sf::Vector2f mouse_position);

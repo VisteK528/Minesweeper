@@ -25,9 +25,6 @@ private:
     sf::Font font;
     sf::Texture app_icon_texture;
 
-    unsigned int width = 1150;
-    unsigned int height = 800;
-
     const sf::Vector2u min_dimensions = {575, 400};
 
     void loadTextures();
