@@ -72,17 +72,17 @@ void ui::Text::setTextColor(sf::Color color)
 
 void ui::Text::setOrigin(ORIGIN origin)
 {
-    this->text.setOrigin(getOrigin(getWidth(), getHeight(), origin));
+    this->text.setOrigin(getOrigin(getWidth(), this->text.getCharacterSize(), origin));
 }
 
 float ui::Text::getWidth() const
 {
-    return this->text.getLocalBounds().width;
+    return this->text.getGlobalBounds().width;
 }
 
 float ui::Text::getHeight() const
 {
-    return this->text.getLocalBounds().height;
+    return this->text.getGlobalBounds().height;
 }
 
 ui::Button::Button(std::string text_str, sf::Font &font, unsigned int size, std::pair<sf::Color, sf::Color> background_color, std::pair<sf::Color, sf::Color> text_color, sf::Vector2f position, sf::Vector2f dimensions, ORIGIN origin){
@@ -176,4 +176,54 @@ const sf::Font &ui::Button::getFont() const {
 
 unsigned int ui::Button::getFontSize() const {
     return font_size;
+}
+
+
+ui::Spinbox::Spinbox(sf::Font &font, unsigned int font_size, std::pair<sf::Color, sf::Color> background_color,
+                     std::pair<sf::Color, sf::Color> text_color, sf::Vector2f position, sf::Vector2f dimensions,
+                     ui::ORIGIN origin, int min_value, int max_value, int start_value) {
+    this->font = font;
+    this->font_size = font_size;
+    this->background_color = background_color;
+    this->text_color = text_color;
+    this->min_value = min_value;
+    this->max_value = max_value;
+    this->dimensions = dimensions;
+    this->origin_coords = getOrigin(dimensions.x, dimensions.y, origin);
+    this->position = position;
+    this->relative_position = sf::Vector2f(position.x-origin_coords.x, position.y-origin_coords.y);
+    this->value = start_value;
+
+    shape.setSize({dimensions.x-(2*dimensions.y), dimensions.y});
+    shape.setFillColor(background_color.first);
+    shape.setOrigin(getOrigin(shape.getSize().x, shape.getSize().y, ui::ORIGIN::C));
+    shape.setPosition(sf::Vector2f(relative_position.x+dimensions.x/2, relative_position.y+dimensions.y/2));
+
+    this->value_widget = std::make_unique<ui::Text>(std::to_string(this->value), font, font_size,text_color.first, sf::Vector2f(relative_position.x+dimensions.x/2, relative_position.y+dimensions.y/2), ui::ORIGIN::C);
+    this->plus = std::make_unique<ui::Button>("+", this->font, font_size, background_color, text_color, sf::Vector2f(relative_position.x+shape.getSize().x+3*(dimensions.y/2), relative_position.y+dimensions.y/2), sf::Vector2f(dimensions.y, dimensions.y), ui::ORIGIN::C);
+    this->minus = std::make_unique<ui::Button>("-", this->font, font_size, background_color, text_color, sf::Vector2f(relative_position.x+dimensions.y/2, relative_position.y+dimensions.y/2), sf::Vector2f(dimensions.y, dimensions.y), ui::ORIGIN::C);
+}
+
+
+int ui::Spinbox::update(sf::Vector2f mouse_position) {
+    if(this->plus->update(mouse_position)){
+        if(value < max_value){
+            value += 1;
+        }
+    }
+    if(this->minus->update(mouse_position)){
+        if(value > min_value){
+            value -= 1;
+        }
+    }
+    this->value_widget->setString(std::to_string(value));
+    this->value_widget->setOrigin(ui::ORIGIN::C);
+    return value;
+}
+
+void ui::Spinbox::draw(sf::RenderTarget &target, sf::RenderStates states) const {
+    target.draw(shape);
+    target.draw(*plus);
+    target.draw(*minus);
+    target.draw(*value_widget);
 }
