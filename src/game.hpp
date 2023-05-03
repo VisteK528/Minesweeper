@@ -13,6 +13,8 @@
 #include "game_state.hpp"
 #include "board_select_state.hpp"
 
+/* @TODO Implement choosing window size depending on the screen resolution
+ */
 
 class Game {
 private:

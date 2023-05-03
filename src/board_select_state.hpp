@@ -4,6 +4,7 @@
 #include "widgets.hpp"
 #include "state.hpp"
 #include "game_state.hpp"
+#include "custom_board_state.hpp"
 
 class BoardSelectState: public State{
 private:

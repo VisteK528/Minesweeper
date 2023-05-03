@@ -18,7 +18,7 @@ void BoardSelectState::initVariables() {
     this->background_rectangle.setPosition(0,0);
     this->background_rectangle.setSize({1150, 800});
     this->background_rectangle.setTexture(&background_texture);
-    this->background_rectangle.setFillColor(sf::Color(255, 255, 255, 180));;
+    this->background_rectangle.setFillColor(sf::Color(255, 255, 255, 180));
 
     std::pair<sf::Color, sf::Color> background_color = {sf::Color(255, 255, 255, 100), sf::Color(255, 255, 255, 200)};
     std::pair<sf::Color, sf::Color> text_color = {sf::Color::White, sf::Color::Red};
@@ -51,7 +51,8 @@ void BoardSelectState::update(){
         states->top()->init();
     }
     if(this->custom->update(static_cast<sf::Vector2f>(position))){
-        states->push(std::make_unique<GameState>(this->window, this->states, 10, 6, 2));
+        // TODO Create new CustomBoardSizeState to enable board size customization
+        states->push(std::make_unique<CustomBoardState>(this->window, this->states, font));
         states->top()->init();
     }
 
