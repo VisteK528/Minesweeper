@@ -6,12 +6,13 @@
 #define MINESWEEPER_CUSTOM_BOARD_STATE_HPP
 
 #include "state.hpp"
-#include "../widgets.hpp"
+#include "../gui_manager.hpp"
 #include "game_state.hpp"
 
 
 class CustomBoardState: public State{
 private:
+    std::shared_ptr<GuiManager> gui_manager;
     std::unique_ptr<ui::Text> title;
     std::unique_ptr<ui::Text> rows_text;
     std::unique_ptr<ui::Text> columns_text;
@@ -33,14 +34,13 @@ private:
     int columns = 20;
     int percentage_mines = 16;
 
-    sf::Font font;
     sf::Image background;
     sf::Texture background_texture;
     sf::RectangleShape background_rectangle;
 
     void initVariables();
 public:
-    CustomBoardState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, sf::Font &font);
+    CustomBoardState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, std::shared_ptr<GuiManager> gui_manager);
 
     void init() override {};
     void update() override;

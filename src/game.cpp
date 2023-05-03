@@ -13,7 +13,7 @@ Game::Game() {
     this->gui_manager = std::make_shared<GuiManager>(this->font, this->widget_background_color, this->widget_text_color);
 
     this->states = std::make_shared<std::stack<std::unique_ptr<State>>>();
-    pushState(std::make_unique<Menu>(this->window, this->states, this->font));
+    pushState(std::make_unique<Menu>(this->window, this->states, this->gui_manager));
     this->states->top()->init();
 }
 

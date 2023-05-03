@@ -44,3 +44,15 @@ std::unique_ptr<ui::Spinbox> GuiManager::createSpinbox(unsigned int font_size, s
                                                        ui::ORIGIN origin){
     return createSpinbox(font_size, position, dimensions, this->background_colors, this->text_colors, min_value, max_value, start_value, origin);
 }
+
+const std::pair<sf::Color, sf::Color> &GuiManager::getBackgroundColors() const {
+    return background_colors;
+}
+
+const std::pair<sf::Color, sf::Color> &GuiManager::getTextColors() const {
+    return text_colors;
+}
+
+const sf::Font &GuiManager::getFont() const {
+    return font;
+}

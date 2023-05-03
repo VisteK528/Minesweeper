@@ -34,6 +34,10 @@ public:
     std::unique_ptr<ui::Spinbox> createSpinbox(unsigned int font_size, sf::Vector2f position, sf::Vector2f dimensions,
                                                int min_value, int max_value, int start_value=0,
                                                ui::ORIGIN origin=ui::ORIGIN::NW);
+
+    const std::pair<sf::Color, sf::Color> &getBackgroundColors() const;
+    const std::pair<sf::Color, sf::Color> &getTextColors() const;
+    const sf::Font &getFont() const;
 };
 
 

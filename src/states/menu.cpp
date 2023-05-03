@@ -1,10 +1,10 @@
 #include "menu.hpp"
 
-Menu::Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, sf::Font& font): State(window, states) {
+Menu::Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, std::shared_ptr<GuiManager> gui_manager): State(window, states) {
     this->title = nullptr;
     this->start = nullptr;
     this->exit = nullptr;
-    this->font = font;
+    this->gui_manager = std::move(gui_manager);
     initVariables();
 }
 
@@ -17,20 +17,16 @@ void Menu::initVariables() {
     this->background_rectangle.setTexture(&background_texture);
     this->background_rectangle.setFillColor(sf::Color(255, 255, 255, 180));;
 
-    std::pair<sf::Color, sf::Color> background_color = {sf::Color::Transparent, sf::Color::Transparent};
-    std::pair<sf::Color, sf::Color> text_color = {sf::Color::White, sf::Color::Red};
-
-
-    this->title = std::make_unique<ui::Text>("Minesweeper", font, 70, sf::Color(255,255,255, 255), sf::Vector2f(575, 300), ui::ORIGIN::C);
-    this->start = std::make_unique<ui::Button>("> Start", this->font, 30, background_color, text_color, sf::Vector2f(575, 450), sf::Vector2f(190, 50), ui::ORIGIN::C);
-    this->exit = std::make_unique<ui::Button>("> Exit", this->font, 30, background_color, text_color, sf::Vector2f(575, 550), sf::Vector2f(155, 50), ui::ORIGIN::C);
+    this->title = gui_manager->createText("Minesweeper", 70, sf::Vector2f(575, 300), ui::ORIGIN::C);
+    this->start = gui_manager->createButton("> Start", 30, sf::Vector2f(575, 450), sf::Vector2f(250, 70), ui::ORIGIN::C);
+    this->exit = gui_manager->createButton("> Exit",30, sf::Vector2f(575, 550), sf::Vector2f(220, 60), ui::ORIGIN::C);
 }
 
 void Menu::update(){
     sf::Vector2f position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
 
     if(this->start->update(position)){
-        this->states->push(std::make_unique<BoardSelectState>(this->window, this->states, this->font));
+        this->states->push(std::make_unique<BoardSelectState>(this->window, this->states, this->gui_manager));
     }
     else if(this->exit->update(position)){
         quit = true;

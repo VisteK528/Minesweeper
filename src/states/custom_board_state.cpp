@@ -6,9 +6,9 @@
 
 CustomBoardState::CustomBoardState(std::shared_ptr<sf::RenderWindow> window,
                                    std::shared_ptr<std::stack<std::unique_ptr<State>>> states,
-                                   sf::Font &font): State(window, states) {
+                                   std::shared_ptr<GuiManager> gui_manager): State(window, states) {
 
-    this->font = font;
+    this->gui_manager = gui_manager;
     this->title = nullptr;
     this->rows_text = nullptr;
     this->columns_text = nullptr;
@@ -32,21 +32,18 @@ void CustomBoardState::initVariables() {
     this->background_rectangle.setTexture(&background_texture);
     this->background_rectangle.setFillColor(sf::Color(255, 255, 255, 180));
 
-    this->title = std::make_unique<ui::Text>("Minesweeper", font, 40, sf::Color(255,255,255, 255), sf::Vector2f(50, 50), ui::ORIGIN::NW);
-    this->rows_text = std::make_unique<ui::Text>("ROWS", font, 20, sf::Color(255,255,255, 255), sf::Vector2f(250, 300), ui::ORIGIN::NW);
-    this->columns_text = std::make_unique<ui::Text>("COLUMNS", font, 20, sf::Color(255,255,255, 255), sf::Vector2f(250, 400), ui::ORIGIN::NW);
-    this->mines_text = std::make_unique<ui::Text>("PERCENTAGE MINES", font, 20, sf::Color(255,255,255, 255), sf::Vector2f(250, 500), ui::ORIGIN::NW);
+    this->title = gui_manager->createText("Minesweeper", 40, sf::Vector2f(50, 50), ui::ORIGIN::NW);
+    this->rows_text = gui_manager->createText("ROWS", 20, sf::Vector2f(250, 300), ui::ORIGIN::NW);
+    this->columns_text = gui_manager->createText("COLUMNS", 20, sf::Vector2f(250, 400), ui::ORIGIN::NW);
+    this->mines_text = gui_manager->createText("PERCENTAGE MINES", 20, sf::Vector2f(250, 500), ui::ORIGIN::NW);
 
-    std::pair<sf::Color, sf::Color> background_color = {sf::Color(80,80,80), sf::Color(120,120,120)};
-    std::pair<sf::Color, sf::Color> text_color = {sf::Color::White, sf::Color::White};
-
-    this->rows_spinbox = std::make_unique<ui::Spinbox>(this->font, 20, background_color, text_color, sf::Vector2f(700, 300), sf::Vector2f(200, 50), ui::ORIGIN::C, rows_range.first, rows_range.second, rows);
-    this->columns_spinbox = std::make_unique<ui::Spinbox>(this->font, 20, background_color, text_color, sf::Vector2f(700, 400), sf::Vector2f(200, 50), ui::ORIGIN::C, columns_range.first, columns_range.second, columns);
-    this->mines_spinbox = std::make_unique<ui::Spinbox>(this->font, 20, background_color, text_color, sf::Vector2f(700, 500), sf::Vector2f(200, 50), ui::ORIGIN::C, mines_percentage_range.first, mines_percentage_range.second, percentage_mines);
+    this->rows_spinbox = gui_manager->createSpinbox(20, sf::Vector2f(700, 300), sf::Vector2f(200, 50), rows_range.first, rows_range.second, rows, ui::ORIGIN::C);
+    this->columns_spinbox = gui_manager->createSpinbox(20, sf::Vector2f(700, 400), sf::Vector2f(200, 50), columns_range.first, columns_range.second, columns, ui::ORIGIN::C);
+    this->mines_spinbox = gui_manager->createSpinbox(20, sf::Vector2f(700, 500), sf::Vector2f(200, 50), mines_percentage_range.first, mines_percentage_range.second, percentage_mines, ui::ORIGIN::C);
 
     std::pair<sf::Color, sf::Color> play_btn_background_clr = {sf::Color(0, 153, 0), sf::Color(0, 204, 0)};
-    this->start_btn = std::make_unique<ui::Button>("Play Game", this->font, 20, play_btn_background_clr, text_color, sf::Vector2f(575, 600), sf::Vector2f(220, 60), ui::ORIGIN::C);
-    this->cancel_btn = std::make_unique<ui::Button>("Cancel", this->font, 20, background_color, text_color, sf::Vector2f(575, 680), sf::Vector2f(200, 50), ui::ORIGIN::C);
+    this->start_btn = gui_manager->createButton("Play Game", 20, sf::Vector2f(575, 600), sf::Vector2f(220, 60), play_btn_background_clr, gui_manager->getTextColors(), ui::ORIGIN::C);
+    this->cancel_btn = gui_manager->createButton("Cancel", 20, sf::Vector2f(575, 680), sf::Vector2f(200, 50), ui::ORIGIN::C);
 }
 
 void CustomBoardState::update() {
@@ -59,7 +56,7 @@ void CustomBoardState::update() {
     if(start_btn->update(position)){
         quit = true;
         int mines = rows*columns*((float)percentage_mines/100);
-        states->push(std::make_unique<GameState>(this->window, this->states, rows, columns, mines));
+        states->push(std::make_unique<GameState>(this->window, this->states, this->gui_manager, rows, columns, mines));
         states->top()->init();
     }
     if(cancel_btn->update(position)){

@@ -1,13 +1,13 @@
 #include "board_select_state.hpp"
 
-BoardSelectState::BoardSelectState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>>states, sf::Font& font): State(window, states) {
+BoardSelectState::BoardSelectState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>>states, std::shared_ptr<GuiManager> gui_manager): State(window, states) {
     this->title = nullptr;
     this->easy = nullptr;
     this->medium = nullptr;
     this->hard = nullptr;
     this->custom = nullptr;
     this->back = nullptr;
-    this->font = font;
+    this->gui_manager = std::move(gui_manager);
     initVariables();
 }
 
@@ -20,16 +20,12 @@ void BoardSelectState::initVariables() {
     this->background_rectangle.setTexture(&background_texture);
     this->background_rectangle.setFillColor(sf::Color(255, 255, 255, 180));
 
-    std::pair<sf::Color, sf::Color> background_color = {sf::Color(255, 255, 255, 100), sf::Color(255, 255, 255, 200)};
-    std::pair<sf::Color, sf::Color> text_color = {sf::Color::White, sf::Color::Red};
-
-
-    this->title = std::make_unique<ui::Text>("Minesweeper", font, 40, sf::Color(255,255,255, 255), sf::Vector2f(50, 50), ui::ORIGIN::NW);
-    this->easy = std::make_unique<ui::Button>("> Easy", this->font, 30, background_color, text_color, sf::Vector2f(425, 400), sf::Vector2f(220, 70), ui::ORIGIN::C);
-    this->medium = std::make_unique<ui::Button>("> Medium", this->font, 30, background_color, text_color, sf::Vector2f(725, 400), sf::Vector2f(250, 70), ui::ORIGIN::C);
-    this->hard = std::make_unique<ui::Button>("> Hard", this->font, 30, background_color, text_color, sf::Vector2f(425, 600), sf::Vector2f(220, 70), ui::ORIGIN::C);
-    this->custom = std::make_unique<ui::Button>("> Custom", this->font, 30, background_color, text_color, sf::Vector2f(725, 600), sf::Vector2f(250, 70), ui::ORIGIN::C);
-    this->back = std::make_unique<ui::Button>("> Back", this->font, 20, background_color, text_color, sf::Vector2f(1125, 775), sf::Vector2f(200, 50), ui::ORIGIN::SE);
+    this->title = gui_manager->createText("Minesweeper", 40, sf::Vector2f(50, 50), ui::ORIGIN::NW);
+    this->easy = gui_manager->createButton("> Easy", 30, sf::Vector2f(425, 400), sf::Vector2f(220, 70), ui::ORIGIN::C);
+    this->medium = gui_manager->createButton("> Medium", 30, sf::Vector2f(725, 400), sf::Vector2f(250, 70), ui::ORIGIN::C);
+    this->hard = gui_manager->createButton("> Hard", 30, sf::Vector2f(425, 600), sf::Vector2f(220, 70), ui::ORIGIN::C);
+    this->custom = gui_manager->createButton("> Custom", 30, sf::Vector2f(725, 600), sf::Vector2f(250, 70), ui::ORIGIN::C);
+    this->back = gui_manager->createButton("> Back", 20, sf::Vector2f(1125, 775), sf::Vector2f(200, 50), ui::ORIGIN::SE);
 }
 
 void BoardSelectState::update(){
@@ -39,20 +35,20 @@ void BoardSelectState::update(){
         quit= true;
     }
     if(this->easy->update(static_cast<sf::Vector2f>(position))){
-        states->push(std::make_unique<GameState>(this->window, this->states, 8, 8, 10));
+        states->push(std::make_unique<GameState>(this->window, this->states, this->gui_manager, 8, 8, 10));
         states->top()->init();
     }
     if(this->medium->update(static_cast<sf::Vector2f>(position))){
-        states->push(std::make_unique<GameState>(this->window, this->states, 16, 16, 40));
+        states->push(std::make_unique<GameState>(this->window, this->states, this->gui_manager,16, 16, 40));
         states->top()->init();
     }
     if(this->hard->update(static_cast<sf::Vector2f>(position))){
-        states->push(std::make_unique<GameState>(this->window, this->states, 16, 30, 99));
+        states->push(std::make_unique<GameState>(this->window, this->states, this->gui_manager,16, 30, 99));
         states->top()->init();
     }
     if(this->custom->update(static_cast<sf::Vector2f>(position))){
         // TODO Create new CustomBoardSizeState to enable board size customization
-        states->push(std::make_unique<CustomBoardState>(this->window, this->states, font));
+        states->push(std::make_unique<CustomBoardState>(this->window, this->states, this->gui_manager));
         states->top()->init();
     }
 

@@ -1,7 +1,7 @@
 #ifndef MINESWEEPER_MENU_HPP
 #define MINESWEEPER_MENU_HPP
 
-#include "../widgets.hpp"
+#include "../gui_manager.hpp"
 #include "state.hpp"
 #include "board_select_state.hpp"
 
@@ -10,7 +10,7 @@ private:
     std::unique_ptr<ui::Text> title;
     std::unique_ptr<ui::Button> start;
     std::unique_ptr<ui::Button> exit;
-    sf::Font font;
+    std::shared_ptr<GuiManager> gui_manager;
 
     sf::Image background;
     sf::Texture background_texture;
@@ -18,7 +18,7 @@ private:
 
     void initVariables();
 public:
-    Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, sf::Font &font);
+    Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, std::shared_ptr<GuiManager> gui_manager);
 
     void init() override {};
     void update() override;
