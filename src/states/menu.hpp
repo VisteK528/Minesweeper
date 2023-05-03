@@ -1,7 +1,7 @@
 #ifndef MINESWEEPER_MENU_HPP
 #define MINESWEEPER_MENU_HPP
 
-#include "widgets.hpp"
+#include "../widgets.hpp"
 #include "state.hpp"
 #include "board_select_state.hpp"
 

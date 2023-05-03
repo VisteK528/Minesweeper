@@ -9,7 +9,7 @@ LINUX_LIBS = -L/usr/lib/x86_64-linux-gnu -lsfml-graphics -lsfml-window -lsfml-sy
 MACOS_INCUDES = -I/opt/homebrew/Cellar/sfml/2.5.1_2/include
 MACOS_LIBS = -L/opt/homebrew/Cellar/sfml/2.5.1_2/lib -lsfml-graphics -lsfml-window -lsfml-system
 
-SRC = ${wildcard src/*.cpp}
+SRC = ${wildcard src/*.cpp} ${wildcard src/states/*.cpp}
 OBJ = ${wildcard build/*}
 
 ifeq ($(OS), Darwin)

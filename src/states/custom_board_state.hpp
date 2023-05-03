@@ -6,7 +6,7 @@
 #define MINESWEEPER_CUSTOM_BOARD_STATE_HPP
 
 #include "state.hpp"
-#include "widgets.hpp"
+#include "../widgets.hpp"
 #include "game_state.hpp"
 
 

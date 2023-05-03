@@ -5,11 +5,11 @@
 #ifndef MINESWEEPER_GAME_STATE_HPP
 #define MINESWEEPER_GAME_STATE_HPP
 
-#include "board.hpp"
+#include "../board.hpp"
 #include "state.hpp"
 #include <chrono>
-#include "exceptions.hpp"
-#include "widgets.hpp"
+#include "../exceptions.hpp"
+#include "../widgets.hpp"
 #include <iostream>
 #include <iomanip>
 #include <sstream>
