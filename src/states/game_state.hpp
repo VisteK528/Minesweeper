@@ -5,13 +5,15 @@
 #ifndef MINESWEEPER_GAME_STATE_HPP
 #define MINESWEEPER_GAME_STATE_HPP
 
-#include "board.hpp"
+#include "../board.hpp"
 #include "state.hpp"
 #include <chrono>
-#include "exceptions.hpp"
-#include "widgets.hpp"
+#include "../exceptions.hpp"
+#include "../gui_manager.hpp"
 #include <iostream>
 #include <iomanip>
+#include <sstream>
+#include <SFML/Graphics.hpp>
 
 class GameState: public State{
 private:
@@ -42,7 +44,6 @@ private:
     // Graphics
     sf::Image image;
     sf::Texture my_texture;
-    sf::Font font;
     sf::Sprite my_sprite;
     std::vector<std::shared_ptr<sf::Texture>> textures;
     std::vector<std::vector<std::shared_ptr<sf::Sprite>>> board_sprites;
@@ -57,6 +58,7 @@ private:
     std::chrono::seconds duration_s;
 
     // Gui widgets
+    std::shared_ptr<GuiManager> gui_manager;
     std::unique_ptr<ui::Text> time_info;
     std::unique_ptr<ui::Text> mines_info;
     std::unique_ptr<ui::Button> play_again_btn;
@@ -70,7 +72,7 @@ private:
     void loadTextures();
     void restart();
 public:
-    GameState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, int rows, int columns, int mines);
+    GameState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, std::shared_ptr<GuiManager> gui_manager, int rows, int columns, int mines);
     virtual ~GameState(){};
 
     void init() override;

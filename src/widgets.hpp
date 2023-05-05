@@ -15,6 +15,7 @@ namespace ui{
 
     class Text;
     class Button;
+    class Spinbox;
 }
 
 class ui::Text: public sf::Drawable {
@@ -55,7 +56,7 @@ public:
 
 class ui::Button: public sf::Drawable{
 private:
-    bool active;
+    //bool active;
     bool clicked;
     sf::Vector2f origin_coords;
 
@@ -94,10 +95,38 @@ public:
     unsigned int getFontSize() const;
 
     void setText(const std::string &textStr);
-    void setActive(bool active=true);
+    //void setActive(bool active=true);
 
     Button(std::string text_str, sf::Font &font, unsigned int size, std::pair<sf::Color, sf::Color> background_color, std::pair<sf::Color, sf::Color> text_color, sf::Vector2f position, sf::Vector2f dimensions, ORIGIN origin);
     bool update(sf::Vector2f mouse_position);
 
+};
+
+class ui::Spinbox: public sf::Drawable{
+private:
+    std::unique_ptr<ui::Button> plus;
+    std::unique_ptr<ui::Button> minus;
+    std::unique_ptr<ui::Text> value_widget;
+    sf::RectangleShape shape;
+
+    std::pair<sf::Color, sf::Color> background_color;
+    std::pair<sf::Color, sf::Color> text_color;
+
+    sf::Font font;
+    unsigned int font_size;
+
+    sf::Vector2f position;
+    sf::Vector2f relative_position;
+    sf::Vector2f dimensions;
+    sf::Vector2f origin_coords;
+
+    int value;
+    int min_value;
+    int max_value;
+
+    void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
+public:
+    Spinbox(sf::Font &font, unsigned int size, std::pair<sf::Color, sf::Color> background_color, std::pair<sf::Color, sf::Color> text_color, sf::Vector2f position, sf::Vector2f dimensions, ORIGIN origin, int min_value, int max_value, int start_value=0);
+    int update(sf::Vector2f mouse_position);
 };
 #endif

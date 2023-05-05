@@ -4,7 +4,7 @@
 
 #include "game_state.hpp"
 
-GameState::GameState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, int rows, int columns, int mines): State(window, states){
+GameState::GameState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, std::shared_ptr<GuiManager> gui_manager, int rows, int columns, int mines): State(window, states){
     this->moves = 0;
     this->rows = rows;
     this->columns = columns;
@@ -17,6 +17,7 @@ GameState::GameState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<s
 
 
     this->board = Board(rows, columns, mines);
+    this->gui_manager = gui_manager;
     this->initVariables();
 }
 
@@ -35,9 +36,9 @@ void GameState::initVariables()
 
 void GameState::renderSprites()
 {
-    for(auto row: board_sprites)
+    for(const auto& row: board_sprites)
     {
-        for(auto sprite: row)
+        for(const auto& sprite: row)
         {
             window->draw(*sprite);
         }
@@ -52,11 +53,6 @@ void GameState::loadTextures()
         throw TexturesLoadingError("Unable to load textures!");
     }
 
-    if(!font.loadFromFile("textures/mine-sweeper.ttf"))
-    {
-        throw FontLoadingError("Unable to load font!");
-    }
-
     for(unsigned int i=0; i<5; i++)
     {
         for(unsigned int j=0; j<4; j++)
@@ -69,16 +65,12 @@ void GameState::loadTextures()
 
 void GameState::init() {
     loadTextures();
-    std::pair<sf::Color, sf::Color> background_color = {sf::Color::Blue, sf::Color::Transparent};
-    std::pair<sf::Color, sf::Color> text_color = {sf::Color::White, sf::Color::Red};
 
-    this->time_info = std::make_unique<ui::Text>("Time: 00:00", font, 18, sf::Color::Yellow, sf::Vector2f(810.f, 50.f));
-    this->mines_info = std::make_unique<ui::Text>("Mines: 0/"+std::to_string(mines), font, 25, sf::Color::Blue, sf::Vector2f(810.f, 10.f));
+    this->time_info = gui_manager->createText("Time: 00:00", 18, sf::Vector2f(810.f, 50.f));
+    this->mines_info = gui_manager->createText("Mines: 0/"+std::to_string(mines), 25, sf::Vector2f(810.f, 10.f));
 
-    this->play_again_btn = std::make_unique<ui::Button>("> Start over", font, 15, background_color, text_color, sf::Vector2f(810, 500), sf::Vector2f(200, 50), ui::ORIGIN::NW);
-    this->change_difficulty_btn = std::make_unique<ui::Button>("> Change difficulty", this->font, 15, background_color, text_color, sf::Vector2f(810, 575), sf::Vector2f(300, 50), ui::ORIGIN::NW);
-    //this->pause_btn = std::make_unique<ui::Button>("> Pause", this->font, 15, background_color, text_color, sf::Vector2f(810, 650), sf::Vector2f(200, 50), ui::ORIGIN::NW);
-    //this->pause_btn->setActive(false);
+    this->play_again_btn = gui_manager->createButton("> Start over", 15, sf::Vector2f(810, 500), sf::Vector2f(200, 50), ui::ORIGIN::NW);
+    this->change_difficulty_btn = gui_manager->createButton("> Change difficulty", 15, sf::Vector2f(810, 575), sf::Vector2f(300, 50), ui::ORIGIN::NW);
     updateBoard();
 }
 
@@ -196,18 +188,6 @@ void GameState::update() {
     if(this->change_difficulty_btn->update(corrected_position)){
         quit = true;
     }
-
-    /*if(this->pause_btn->update(corrected_position)){
-        if(game_on){
-            game_on = false;
-            this->pause_btn->setText("> Resume");
-        }
-        else{
-            game_on = true;
-            this->pause_btn->setText("> Pause");
-        }
-    }*/
-
 }
 
 void GameState::restart() {
@@ -215,7 +195,6 @@ void GameState::restart() {
     this->time_info->setString("Time: 00:00");
     this->mines_info->setString("Mines: 0/"+std::to_string(mines));
     this->play_again_btn->setText("> Start over");
-    //this->pause_btn->setText("> Pause");
     game_on = true;
     moves = 0;
     board.loadBoardWithRandomValues(mines);
@@ -227,5 +206,4 @@ void GameState::render(std::shared_ptr<sf::RenderTarget> target) {
     target->draw(*mines_info);
     target->draw(*change_difficulty_btn);
     target->draw(*play_again_btn);
-    //target->draw(*pause_btn);
 }

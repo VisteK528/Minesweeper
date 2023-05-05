@@ -1,9 +1,10 @@
 #ifndef MINESWEEPER_BOARD_SELECT_STATE_HPP
 #define MINESWEEPER_BOARD_SELECT_STATE_HPP
 
-#include "widgets.hpp"
+#include "../gui_manager.hpp"
 #include "state.hpp"
 #include "game_state.hpp"
+#include "custom_board_state.hpp"
 
 class BoardSelectState: public State{
 private:
@@ -13,7 +14,8 @@ private:
     std::unique_ptr<ui::Button> hard;
     std::unique_ptr<ui::Button> custom;
     std::unique_ptr<ui::Button> back;
-    sf::Font font;
+
+    std::shared_ptr<GuiManager> gui_manager;
 
     sf::Image background;
     sf::Texture background_texture;
@@ -21,7 +23,7 @@ private:
 
     void initVariables();
 public:
-    BoardSelectState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, sf::Font &font);
+    BoardSelectState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<std::stack<std::unique_ptr<State>>> states, std::shared_ptr<GuiManager> gui_manager);
 
     void init() override {};
     void update() override;
