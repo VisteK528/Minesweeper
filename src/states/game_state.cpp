@@ -132,46 +132,10 @@ void GameState::update() {
     play_again_btn->updatePosition(change_ratio, this->window);
     change_difficulty_btn->updatePosition(change_ratio, this->window);
 
-    board_width = board_ratio.first * size.x;
-    board_height = board_ratio.second * size.y;
-    position_size = std::min(board_ratio.first * size.x / columns, board_ratio.second * size.y / rows);
-
-    sf::Vector2i position = sf::Mouse::getPosition(*window);
-    sf::Vector2i mouse_board_coords = {int((position.x-offset.x)/position_size), int((position.y-offset.y)/position_size)};
-
-    if(0 <= mouse_board_coords.x && mouse_board_coords.x < columns && 0 <= mouse_board_coords.y && mouse_board_coords.y < rows && game_on)
-    {
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-            if(!button_left_pressed){
-                moves++;
-                button_left_pressed = true;
-                button_right_pressed = false;
-                if(moves == 1)
-                {
-                    start = std::chrono::high_resolution_clock::now();
-                }
-                result = board.makeMove(mouse_board_coords.x, mouse_board_coords.y, UNCOVER);
-            }
-
-        }
-        else if(sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-            if(!button_right_pressed){
-                button_left_pressed = false;
-                button_right_pressed = true;
-                result = board.makeMove(mouse_board_coords.x, mouse_board_coords.y, FLAG);
-                mines_info->setString("Mines: "+std::to_string(board.getFlaggedMines())+'/'+std::to_string(mines));
-            }
-        }
-        else {
-            button_left_pressed = false;
-            button_right_pressed = false;
-        }
-    }
     if(result != CARRY_ON){
         game_on = false;
         this->play_again_btn->setText("> Play again");
     }
-    updateBoard();
 
     if(game_on && moves != 0)
     {
@@ -194,10 +158,37 @@ void GameState::update() {
     if(this->change_difficulty_btn->update(corrected_position)){
         quit = true;
     }
+
+    updateBoard();
 }
 
 void GameState::handleEvent(const sf::Event &e) {
+    sf::Vector2f size = this->window->getView().getSize();
 
+    board_width = board_ratio.first * size.x;
+    board_height = board_ratio.second * size.y;
+    position_size = std::min(board_ratio.first * size.x / columns, board_ratio.second * size.y / rows);
+
+    sf::Vector2i position = sf::Mouse::getPosition(*window);
+    sf::Vector2i mouse_board_coords = {int((position.x-offset.x)/position_size), int((position.y-offset.y)/position_size)};
+
+    if(0 <= mouse_board_coords.x && mouse_board_coords.x < columns && 0 <= mouse_board_coords.y && mouse_board_coords.y < rows && game_on)
+    {
+        if(e.type == sf::Event::MouseButtonReleased){
+            if(e.mouseButton.button == sf::Mouse::Left){
+                moves++;
+                if(moves == 1)
+                {
+                    start = std::chrono::high_resolution_clock::now();
+                }
+                result = board.makeMove(mouse_board_coords.x, mouse_board_coords.y, UNCOVER);
+            }
+            else if(e.mouseButton.button == sf::Mouse::Right){
+                result = board.makeMove(mouse_board_coords.x, mouse_board_coords.y, FLAG);
+                mines_info->setString("Mines: "+std::to_string(board.getFlaggedMines())+'/'+std::to_string(mines));
+            }
+        }
+    }
 }
 
 void GameState::restart() {
