@@ -33,6 +33,10 @@ void Menu::update(){
     }
 }
 
+void Menu::handleEvent(const sf::Event &e) {
+
+}
+
 void Menu::render(std::shared_ptr<sf::RenderTarget> target){
     target->draw(this->background_rectangle);
     target->draw(*this->title);

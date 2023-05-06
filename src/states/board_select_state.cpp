@@ -47,10 +47,13 @@ void BoardSelectState::update(){
         states->top()->init();
     }
     if(this->custom->update(static_cast<sf::Vector2f>(position))){
-        // TODO Create new CustomBoardSizeState to enable board size customization
         states->push(std::make_unique<CustomBoardState>(this->window, this->states, this->gui_manager));
         states->top()->init();
     }
+
+}
+
+void BoardSelectState::handleEvent(const sf::Event &e) {
 
 }
 

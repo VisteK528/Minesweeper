@@ -64,6 +64,10 @@ void CustomBoardState::update() {
     }
 }
 
+void CustomBoardState::handleEvent(const sf::Event &e) {
+
+}
+
 void CustomBoardState::render(std::shared_ptr<sf::RenderTarget> target) {
     target->draw(this->background_rectangle);
     target->draw(*title);

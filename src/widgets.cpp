@@ -85,6 +85,16 @@ float ui::Text::getHeight() const
     return this->text.getGlobalBounds().height;
 }
 
+sf::Vector2f ui::Text::getPosition() const{
+    return this->position;
+}
+
+void ui::Text::updatePosition(std::pair<double, double> change_ratio, const std::shared_ptr<sf::RenderWindow>& window){
+    sf::Vector2i integer_position = {(int)(this->position.x*change_ratio.first), (int)(this->position.y*change_ratio.second)};
+    this->text.setPosition(window->mapPixelToCoords(integer_position, window->getView()));
+    this->text.setScale(change_ratio.first, change_ratio.second);
+}
+
 ui::Button::Button(std::string text_str, sf::Font &font, unsigned int size, std::pair<sf::Color, sf::Color> background_color, std::pair<sf::Color, sf::Color> text_color, sf::Vector2f position, sf::Vector2f dimensions, ORIGIN origin){
     this->text_str = text_str;
     this->font = font;
@@ -106,7 +116,7 @@ ui::Button::Button(std::string text_str, sf::Font &font, unsigned int size, std:
 }
 
 bool ui::Button::update(sf::Vector2f mouse_position) {
-    if(mouse_position.x >= relative_position.x && mouse_position.x <= relative_position.x+dimensions.x && mouse_position.y >= relative_position.y && mouse_position.y <= relative_position.y+dimensions.y){
+    if(mouse_position.x >= relative_position.x && mouse_position.x <= relative_position.x+shape.getSize().x*shape.getScale().x && mouse_position.y >= relative_position.y && mouse_position.y <= relative_position.y+shape.getSize().y*shape.getScale().y){
         shape.setFillColor(background_color.second);
         text->setTextColor(text_color.second);
     }
@@ -118,7 +128,7 @@ bool ui::Button::update(sf::Vector2f mouse_position) {
     if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
         if(!clicked){
             clicked = true;
-            if(mouse_position.x >= relative_position.x && mouse_position.x <= relative_position.x+dimensions.x && mouse_position.y >= relative_position.y && mouse_position.y <= relative_position.y+dimensions.y){
+            if(mouse_position.x >= relative_position.x && mouse_position.x <= relative_position.x+shape.getSize().x*shape.getScale().x && mouse_position.y >= relative_position.y && mouse_position.y <= relative_position.y+shape.getSize().y*shape.getScale().y){
                 return true;
             }
         }
@@ -134,11 +144,12 @@ void ui::Button::setText(const std::string &textStr) {
     this->text->setString(textStr);
 }
 
-/*void ui::Button::setActive(bool active) {
-    if(!active){
-        this->shape.setFillColor(sf::Color(255, 255, 255, 255));
-    }
-}*/
+void ui::Button::setPosition(const sf::Vector2f& position){
+    this->position = position;
+    this->relative_position = sf::Vector2f(position.x-origin_coords.x, position.y-origin_coords.y);
+    shape.setPosition(position);
+    text->setPosition(position);
+}
 
 void ui::Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
@@ -176,6 +187,14 @@ const sf::Font &ui::Button::getFont() const {
 
 unsigned int ui::Button::getFontSize() const {
     return font_size;
+}
+
+void ui::Button::updatePosition(std::pair<double, double> change_ratio, const std::shared_ptr<sf::RenderWindow>& window){
+    sf::Vector2i integer_position = {(int)(this->position.x*change_ratio.first), (int)(this->position.y*change_ratio.second)};
+    this->shape.setPosition(window->mapPixelToCoords(integer_position, window->getView()));
+    this->text->updatePosition(change_ratio, window);
+    this->relative_position = static_cast<sf::Vector2f>((window->mapPixelToCoords(integer_position, window->getView())));
+    this->shape.setScale(change_ratio.first, change_ratio.second);
 }
 
 

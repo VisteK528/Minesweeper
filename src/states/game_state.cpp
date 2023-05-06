@@ -125,6 +125,12 @@ void GameState::updateBoard()
 
 void GameState::update() {
     sf::Vector2f size = this->window->getView().getSize();
+    std::pair<double, double> change_ratio = {size.x/1150., size.y/800.};
+    mines_info->updatePosition(change_ratio, this->window);
+    time_info->updatePosition(change_ratio, this->window);
+
+    play_again_btn->updatePosition(change_ratio, this->window);
+    change_difficulty_btn->updatePosition(change_ratio, this->window);
 
     board_width = board_ratio.first * size.x;
     board_height = board_ratio.second * size.y;
@@ -188,6 +194,10 @@ void GameState::update() {
     if(this->change_difficulty_btn->update(corrected_position)){
         quit = true;
     }
+}
+
+void GameState::handleEvent(const sf::Event &e) {
+
 }
 
 void GameState::restart() {

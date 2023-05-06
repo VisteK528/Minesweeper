@@ -18,6 +18,7 @@ public:
     virtual ~State();
 
     virtual void init() = 0;
+    virtual void handleEvent(const sf::Event& e) = 0;
     const bool& getQuit() const;
     virtual void update() = 0;
     virtual void render(std::shared_ptr<sf::RenderTarget> target = nullptr) = 0;

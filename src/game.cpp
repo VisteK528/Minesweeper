@@ -59,6 +59,12 @@ void Game::updateSFMLEvents() {
             sf::Vector2f view_size = {static_cast<float>(this->e.size.width), static_cast<float>(this->e.size.height)};
             view->setSize(view_size);
             window->setView(*view);
+            if(view_size.x < min_dimensions.x || view_size.y < min_dimensions.y){
+                window->setSize(min_dimensions);
+            }
+        }
+        if(!this->states->empty()){
+            this->states->top()->handleEvent(e);
         }
     }
 }

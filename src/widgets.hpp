@@ -49,6 +49,9 @@ public:
      * */
     float getHeight() const;
 
+    sf::Vector2f getPosition() const;
+    void updatePosition(std::pair<double, double> change_ratio, const std::shared_ptr<sf::RenderWindow>& window);
+
     Text(std::string text_str, sf::Font &font, unsigned int size, sf::Color color, sf::Vector2f position,
          ORIGIN origin = NW);
 
@@ -95,7 +98,9 @@ public:
     unsigned int getFontSize() const;
 
     void setText(const std::string &textStr);
-    //void setActive(bool active=true);
+
+    void setPosition(const sf::Vector2f& position);
+    void updatePosition(std::pair<double, double> change_ratio, const std::shared_ptr<sf::RenderWindow>& window);
 
     Button(std::string text_str, sf::Font &font, unsigned int size, std::pair<sf::Color, sf::Color> background_color, std::pair<sf::Color, sf::Color> text_color, sf::Vector2f position, sf::Vector2f dimensions, ORIGIN origin);
     bool update(sf::Vector2f mouse_position);

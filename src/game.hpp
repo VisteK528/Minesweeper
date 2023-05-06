@@ -31,7 +31,7 @@ private:
     std::pair<sf::Color, sf::Color> widget_background_color;
     std::pair<sf::Color, sf::Color> widget_text_color;
 
-    const sf::Vector2u min_dimensions = {575, 400};
+    const sf::Vector2u min_dimensions = {632, 440};
 
     void loadTextures();
     void setIcon();
