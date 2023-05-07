@@ -47,25 +47,46 @@ void CustomBoardState::initVariables() {
 }
 
 void CustomBoardState::update() {
+    updateStateDimensions();
+    this->title->updatePosition(change_ratio, window);
+    this->mines_text->updatePosition(change_ratio, window);
+    this->columns_text->updatePosition(change_ratio, window);
+    this->rows_text->updatePosition(change_ratio, window);
+
+
+    this->start_btn->updatePosition(change_ratio, window);
+    this->cancel_btn->updatePosition(change_ratio, window);
+    this->rows_spinbox->updatePosition(change_ratio, window);
+    this->columns_spinbox->updatePosition(change_ratio, window);
+    this->mines_spinbox->updatePosition(change_ratio, window);
+
+    sf::Vector2f position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
+    this->start_btn->update(position);
+    this->cancel_btn->update(position);
+    this->rows_spinbox->update(position);
+    this->columns_spinbox->update(position);
+    this->mines_spinbox->update(position);
+
+    this->background_rectangle.setScale((float)change_ratio.first, (float)change_ratio.second);
+    this->background_rectangle.setPosition((1150.-this->window->getSize().x)/2., (800.-this->window->getSize().y)/2.);
+}
+
+void CustomBoardState::handleEvent(const sf::Event &e) {
     sf::Vector2f position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
 
-    rows = rows_spinbox->update(position);
-    columns = columns_spinbox->update(position);
-    percentage_mines = mines_spinbox->update(position);
+    rows = rows_spinbox->handleInput(position, e);
+    columns = columns_spinbox->handleInput(position, e);
+    percentage_mines = mines_spinbox->handleInput(position, e);
 
-    if(start_btn->update(position)){
+    if(start_btn->handleInput(position, e)){
         quit = true;
         int mines = rows*columns*((float)percentage_mines/100);
         states->push(std::make_unique<GameState>(this->window, this->states, this->gui_manager, rows, columns, mines));
         states->top()->init();
     }
-    if(cancel_btn->update(position)){
+    if(cancel_btn->handleInput(position, e)){
         quit = true;
     }
-}
-
-void CustomBoardState::handleEvent(const sf::Event &e) {
-
 }
 
 void CustomBoardState::render(std::shared_ptr<sf::RenderTarget> target) {

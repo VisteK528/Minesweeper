@@ -72,6 +72,12 @@ void ui::Text::setTextColor(sf::Color color)
 
 void ui::Text::setOrigin(ORIGIN origin)
 {
+    /*if(this->text_string.length() == 1){
+        this->text.setOrigin(getOrigin(this->text.getCharacterSize(), this->text.getCharacterSize(), origin));
+    }
+    else{
+        this->text.setOrigin(getOrigin(getWidth(), this->text.getCharacterSize(), origin));
+    }*/
     this->text.setOrigin(getOrigin(getWidth(), this->text.getCharacterSize(), origin));
 }
 
@@ -115,7 +121,25 @@ ui::Button::Button(std::string text_str, sf::Font &font, unsigned int size, std:
     this->text = std::make_unique<ui::Text>(text_str, font, font_size, text_color.first,sf::Vector2f(relative_position.x+dimensions.x/2, relative_position.y+dimensions.y/2), ui::ORIGIN::C);
 }
 
-bool ui::Button::update(sf::Vector2f mouse_position) {
+bool ui::Button::handleInput(sf::Vector2f mouse_position, const sf::Event& e) {
+    if(mouse_position.x >= relative_position.x && mouse_position.x <= relative_position.x+shape.getSize().x*shape.getScale().x && mouse_position.y >= relative_position.y && mouse_position.y <= relative_position.y+shape.getSize().y*shape.getScale().y){
+        shape.setFillColor(background_color.second);
+        text->setTextColor(text_color.second);
+        if(e.type == sf::Event::MouseButtonReleased){
+            if(e.mouseButton.button == sf::Mouse::Left){
+                return true;
+            }
+        }
+    }
+    else{
+        shape.setFillColor(background_color.first);
+        text->setTextColor(text_color.first);
+    }
+    return false;
+}
+
+
+void ui::Button::update(sf::Vector2f mouse_position) {
     if(mouse_position.x >= relative_position.x && mouse_position.x <= relative_position.x+shape.getSize().x*shape.getScale().x && mouse_position.y >= relative_position.y && mouse_position.y <= relative_position.y+shape.getSize().y*shape.getScale().y){
         shape.setFillColor(background_color.second);
         text->setTextColor(text_color.second);
@@ -124,19 +148,6 @@ bool ui::Button::update(sf::Vector2f mouse_position) {
         shape.setFillColor(background_color.first);
         text->setTextColor(text_color.first);
     }
-
-    if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-        if(!clicked){
-            clicked = true;
-            if(mouse_position.x >= relative_position.x && mouse_position.x <= relative_position.x+shape.getSize().x*shape.getScale().x && mouse_position.y >= relative_position.y && mouse_position.y <= relative_position.y+shape.getSize().y*shape.getScale().y){
-                return true;
-            }
-        }
-    }
-    else{
-        clicked = false;
-    }
-    return false;
 }
 
 void ui::Button::setText(const std::string &textStr) {
@@ -194,6 +205,8 @@ void ui::Button::updatePosition(std::pair<double, double> change_ratio, const st
     this->shape.setPosition(window->mapPixelToCoords(integer_position, window->getView()));
     this->text->updatePosition(change_ratio, window);
     this->relative_position = static_cast<sf::Vector2f>((window->mapPixelToCoords(integer_position, window->getView())));
+    this->relative_position = {relative_position.x-(float)change_ratio.first*origin_coords.x, relative_position.y-(float)change_ratio.second*origin_coords.y};
+
     this->shape.setScale(change_ratio.first, change_ratio.second);
 }
 
@@ -224,20 +237,24 @@ ui::Spinbox::Spinbox(sf::Font &font, unsigned int font_size, std::pair<sf::Color
 }
 
 
-int ui::Spinbox::update(sf::Vector2f mouse_position) {
-    if(this->plus->update(mouse_position)){
+int ui::Spinbox::handleInput(sf::Vector2f mouse_position, const sf::Event& e) {
+    if(this->plus->handleInput(mouse_position, e)){
         if(value < max_value){
             value += 1;
         }
     }
-    if(this->minus->update(mouse_position)){
+    if(this->minus->handleInput(mouse_position, e)){
         if(value > min_value){
             value -= 1;
         }
     }
     this->value_widget->setString(std::to_string(value));
-    this->value_widget->setOrigin(ui::ORIGIN::C);
     return value;
+}
+
+void ui::Spinbox::update(sf::Vector2f mouse_position) {
+    this->plus->update(mouse_position);
+    this->minus->update(mouse_position);
 }
 
 void ui::Spinbox::draw(sf::RenderTarget &target, sf::RenderStates states) const {
@@ -245,4 +262,18 @@ void ui::Spinbox::draw(sf::RenderTarget &target, sf::RenderStates states) const 
     target.draw(*plus);
     target.draw(*minus);
     target.draw(*value_widget);
+}
+
+void
+ui::Spinbox::updatePosition(std::pair<double, double> change_ratio, const std::shared_ptr<sf::RenderWindow> &window) {
+    sf::Vector2i integer_position = {(int)(this->position.x*change_ratio.first), (int)(this->position.y*change_ratio.second)};
+    this->shape.setPosition(window->mapPixelToCoords(integer_position, window->getView()));
+    this->relative_position = static_cast<sf::Vector2f>((window->mapPixelToCoords(integer_position, window->getView())));
+    this->relative_position = {relative_position.x-(float)change_ratio.first*origin_coords.x, relative_position.y-(float)change_ratio.second*origin_coords.y};
+
+    this->value_widget->updatePosition(change_ratio, window);
+
+    this->plus->updatePosition(change_ratio, window);
+    this->minus->updatePosition(change_ratio, window);
+    this->shape.setScale(change_ratio.first, change_ratio.second);
 }

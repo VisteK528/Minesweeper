@@ -7,6 +7,7 @@
 #include <chrono>
 #include <memory>
 #include <string>
+#include <math.h>
 
 namespace ui{
     typedef enum{N, S, W, E, NW, NE, SW, SE, C} ORIGIN;
@@ -59,7 +60,6 @@ public:
 
 class ui::Button: public sf::Drawable{
 private:
-    //bool active;
     bool clicked;
     sf::Vector2f origin_coords;
 
@@ -103,7 +103,8 @@ public:
     void updatePosition(std::pair<double, double> change_ratio, const std::shared_ptr<sf::RenderWindow>& window);
 
     Button(std::string text_str, sf::Font &font, unsigned int size, std::pair<sf::Color, sf::Color> background_color, std::pair<sf::Color, sf::Color> text_color, sf::Vector2f position, sf::Vector2f dimensions, ORIGIN origin);
-    bool update(sf::Vector2f mouse_position);
+    void update(sf::Vector2f mouse_position);
+    bool handleInput(sf::Vector2f mouse_position, const sf::Event& e);
 
 };
 
@@ -132,6 +133,8 @@ private:
     void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 public:
     Spinbox(sf::Font &font, unsigned int size, std::pair<sf::Color, sf::Color> background_color, std::pair<sf::Color, sf::Color> text_color, sf::Vector2f position, sf::Vector2f dimensions, ORIGIN origin, int min_value, int max_value, int start_value=0);
-    int update(sf::Vector2f mouse_position);
+    void update(sf::Vector2f mouse_position);
+    int handleInput(sf::Vector2f mouse_position, const sf::Event& e);
+    void updatePosition(std::pair<double, double> change_ratio, const std::shared_ptr<sf::RenderWindow>& window);
 };
 #endif

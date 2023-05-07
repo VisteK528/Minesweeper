@@ -11,3 +11,8 @@ State::~State(){}
 const bool& State::getQuit() const{
     return this->quit;
 }
+
+void State::updateStateDimensions() {
+    sf::Vector2f size = this->window->getView().getSize();
+    change_ratio = {size.x/1150., size.y/800.};
+}

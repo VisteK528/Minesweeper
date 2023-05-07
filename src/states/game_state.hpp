@@ -63,9 +63,10 @@ private:
     std::unique_ptr<ui::Text> mines_info;
     std::unique_ptr<ui::Button> play_again_btn;
     std::unique_ptr<ui::Button> change_difficulty_btn;
-    std::unique_ptr<ui::Button> pause_btn;
 
     // Game methods
+    void updateStateDimensions() override;
+
     void initVariables();
     void updateBoard();
     void renderSprites();

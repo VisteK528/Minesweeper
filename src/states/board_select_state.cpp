@@ -29,32 +29,48 @@ void BoardSelectState::initVariables() {
 }
 
 void BoardSelectState::update(){
+    updateStateDimensions();
+    this->title->updatePosition(change_ratio, window);
+
+    this->back->updatePosition(change_ratio, window);
+    this->easy->updatePosition(change_ratio, window);
+    this->medium->updatePosition(change_ratio, window);
+    this->hard->updatePosition(change_ratio, window);
+    this->custom->updatePosition(change_ratio, window);
+
     sf::Vector2f position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
+    this->back->update(position);
+    this->easy->update(position);
+    this->medium->update(position);
+    this->hard->update(position);
+    this->custom->update(position);
 
-    if(this->back->update(static_cast<sf::Vector2f>(position))){
-        quit= true;
-    }
-    if(this->easy->update(static_cast<sf::Vector2f>(position))){
-        states->push(std::make_unique<GameState>(this->window, this->states, this->gui_manager, 8, 8, 10));
-        states->top()->init();
-    }
-    if(this->medium->update(static_cast<sf::Vector2f>(position))){
-        states->push(std::make_unique<GameState>(this->window, this->states, this->gui_manager,16, 16, 40));
-        states->top()->init();
-    }
-    if(this->hard->update(static_cast<sf::Vector2f>(position))){
-        states->push(std::make_unique<GameState>(this->window, this->states, this->gui_manager,16, 30, 99));
-        states->top()->init();
-    }
-    if(this->custom->update(static_cast<sf::Vector2f>(position))){
-        states->push(std::make_unique<CustomBoardState>(this->window, this->states, this->gui_manager));
-        states->top()->init();
-    }
-
+    this->background_rectangle.setScale((float)change_ratio.first, (float)change_ratio.second);
+    this->background_rectangle.setPosition((1150.-this->window->getSize().x)/2., (800.-this->window->getSize().y)/2.);
 }
 
 void BoardSelectState::handleEvent(const sf::Event &e) {
+    sf::Vector2f position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
 
+    if(this->back->handleInput(static_cast<sf::Vector2f>(position), e)){
+        quit= true;
+    }
+    if(this->easy->handleInput(static_cast<sf::Vector2f>(position), e)){
+        states->push(std::make_unique<GameState>(this->window, this->states, this->gui_manager, 8, 8, 10));
+        states->top()->init();
+    }
+    if(this->medium->handleInput(static_cast<sf::Vector2f>(position), e)){
+        states->push(std::make_unique<GameState>(this->window, this->states, this->gui_manager,16, 16, 40));
+        states->top()->init();
+    }
+    if(this->hard->handleInput(static_cast<sf::Vector2f>(position), e)){
+        states->push(std::make_unique<GameState>(this->window, this->states, this->gui_manager,16, 30, 99));
+        states->top()->init();
+    }
+    if(this->custom->handleInput(static_cast<sf::Vector2f>(position), e)){
+        states->push(std::make_unique<CustomBoardState>(this->window, this->states, this->gui_manager));
+        states->top()->init();
+    }
 }
 
 void BoardSelectState::render(std::shared_ptr<sf::RenderTarget> target){

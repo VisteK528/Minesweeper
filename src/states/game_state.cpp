@@ -13,11 +13,10 @@ GameState::GameState(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<s
     this->time_info = nullptr;
     this->play_again_btn = nullptr;
     this->change_difficulty_btn = nullptr;
-    this->pause_btn = nullptr;
 
 
     this->board = Board(rows, columns, mines);
-    this->gui_manager = gui_manager;
+    this->gui_manager = std::move(gui_manager);
     this->initVariables();
 }
 
@@ -74,6 +73,15 @@ void GameState::init() {
     updateBoard();
 }
 
+void GameState::updateStateDimensions() {
+    sf::Vector2f size = this->window->getView().getSize();
+
+    board_width = board_ratio.first * size.x;
+    board_height = board_ratio.second * size.y;
+    position_size = std::min(board_ratio.first * size.x / columns, board_ratio.second * size.y / rows);
+    change_ratio = {size.x/1150., size.y/800.};
+}
+
 void GameState::updateBoard()
 {
     // Load board
@@ -124,18 +132,25 @@ void GameState::updateBoard()
 }
 
 void GameState::update() {
-    sf::Vector2f size = this->window->getView().getSize();
-    std::pair<double, double> change_ratio = {size.x/1150., size.y/800.};
+    updateStateDimensions();
+
     mines_info->updatePosition(change_ratio, this->window);
     time_info->updatePosition(change_ratio, this->window);
 
     play_again_btn->updatePosition(change_ratio, this->window);
     change_difficulty_btn->updatePosition(change_ratio, this->window);
 
+    sf::Vector2f corrected_position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
+    play_again_btn->update(corrected_position);
+    change_difficulty_btn->update(corrected_position);
+
+
     if(result != CARRY_ON){
         game_on = false;
         this->play_again_btn->setText("> Play again");
     }
+
+    updateBoard();
 
     if(game_on && moves != 0)
     {
@@ -148,26 +163,10 @@ void GameState::update() {
         time_info->setString(stream.str());
 
     }
-
-    //Relative position after view change
-    sf::Vector2f corrected_position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
-
-    if(this->play_again_btn->update(corrected_position)){
-        restart();
-    }
-    if(this->change_difficulty_btn->update(corrected_position)){
-        quit = true;
-    }
-
-    updateBoard();
 }
 
 void GameState::handleEvent(const sf::Event &e) {
-    sf::Vector2f size = this->window->getView().getSize();
-
-    board_width = board_ratio.first * size.x;
-    board_height = board_ratio.second * size.y;
-    position_size = std::min(board_ratio.first * size.x / columns, board_ratio.second * size.y / rows);
+    updateStateDimensions();
 
     sf::Vector2i position = sf::Mouse::getPosition(*window);
     sf::Vector2i mouse_board_coords = {int((position.x-offset.x)/position_size), int((position.y-offset.y)/position_size)};
@@ -187,7 +186,18 @@ void GameState::handleEvent(const sf::Event &e) {
                 result = board.makeMove(mouse_board_coords.x, mouse_board_coords.y, FLAG);
                 mines_info->setString("Mines: "+std::to_string(board.getFlaggedMines())+'/'+std::to_string(mines));
             }
+            updateBoard();
         }
+    }
+
+    //Relative position after view change
+    sf::Vector2f corrected_position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
+
+    if(this->play_again_btn->handleInput(corrected_position, e)){
+        restart();
+    }
+    if(this->change_difficulty_btn->handleInput(corrected_position, e)){
+        quit = true;
     }
 }
 

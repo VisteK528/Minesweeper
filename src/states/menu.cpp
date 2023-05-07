@@ -23,18 +23,29 @@ void Menu::initVariables() {
 }
 
 void Menu::update(){
-    sf::Vector2f position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
+    updateStateDimensions();
+    this->start->updatePosition(change_ratio, this->window);
+    this->exit->updatePosition(change_ratio, this->window);
+    this->title->updatePosition(change_ratio, this->window);
 
-    if(this->start->update(position)){
-        this->states->push(std::make_unique<BoardSelectState>(this->window, this->states, this->gui_manager));
-    }
-    else if(this->exit->update(position)){
-        quit = true;
-    }
+    sf::Vector2f position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
+    this->start->update(position);
+    this->exit->update(position);
+
+    this->background_rectangle.setScale((float)change_ratio.first, (float)change_ratio.second);
+    this->background_rectangle.setPosition((1150.-this->window->getSize().x)/2., (800.-this->window->getSize().y)/2.);
 }
 
 void Menu::handleEvent(const sf::Event &e) {
+    updateStateDimensions();
+    sf::Vector2f position = window->mapPixelToCoords(sf::Mouse::getPosition(*this->window), window->getView());
 
+    if(this->start->handleInput(position, e)){
+        this->states->push(std::make_unique<BoardSelectState>(this->window, this->states, this->gui_manager));
+    }
+    else if(this->exit->handleInput(position, e)){
+        quit = true;
+    }
 }
 
 void Menu::render(std::shared_ptr<sf::RenderTarget> target){
