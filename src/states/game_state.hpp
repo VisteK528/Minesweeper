@@ -18,8 +18,6 @@
 class GameState: public State{
 private:
     RESULTS result = CARRY_ON;
-    bool button_left_pressed = false;
-    bool button_right_pressed = false;
     bool game_on = true;
 
     //Size

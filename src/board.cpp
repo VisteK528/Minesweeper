@@ -238,3 +238,12 @@ bool Board::checkIfWinning() const {
     if(correctly_flagged == flagged_mines && correctly_flagged == mines) return true;
     return false;
 }
+
+bool Board::isPositionValid(int row, int column) const {
+    if(0 <= row && row < rows && 0 <= column && column < columns){
+        return true;
+    }
+    else{
+        return false;
+    }
+}

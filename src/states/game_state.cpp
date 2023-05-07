@@ -47,7 +47,7 @@ void GameState::renderSprites()
 void GameState::loadTextures()
 {
     // Load texturemap
-    if(!image.loadFromFile("textures/textures.png"))
+    if(!image.loadFromFile("textures/textures2.png"))
     {
         throw TexturesLoadingError("Unable to load textures!");
     }
@@ -144,13 +144,35 @@ void GameState::update() {
     play_again_btn->update(corrected_position);
     change_difficulty_btn->update(corrected_position);
 
+    sf::Vector2i position = sf::Mouse::getPosition(*window);
+    sf::Vector2i mouse_board_coords = {int((position.x-offset.x)/position_size), int((position.y-offset.y)/position_size)};
+
+    updateBoard();
+    if(result == CARRY_ON){
+        auto board_cells = board.getBoard();
+        if(board.isPositionValid(mouse_board_coords.y, mouse_board_coords.x)){
+            if(board_cells[mouse_board_coords.y][mouse_board_coords.x].getMaskedValue() == COVERED){
+                board_sprites[mouse_board_coords.y][mouse_board_coords.x]->setTexture(*textures[2]);
+                if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+                    board_sprites[mouse_board_coords.y][mouse_board_coords.x]->setTexture(*textures[3]);
+                }
+            }
+            if(board_cells[mouse_board_coords.y][mouse_board_coords.x].getMaskedValue() == QUESTION){
+                board_sprites[mouse_board_coords.y][mouse_board_coords.x]->setTexture(*textures[6]);
+                if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+                    board_sprites[mouse_board_coords.y][mouse_board_coords.x]->setTexture(*textures[7]);
+                }
+            }
+            if(board_cells[mouse_board_coords.y][mouse_board_coords.x].getMaskedValue() == FLAGGED){
+                board_sprites[mouse_board_coords.y][mouse_board_coords.x]->setTexture(*textures[1]);
+            }
+        }
+    }
 
     if(result != CARRY_ON){
         game_on = false;
         this->play_again_btn->setText("> Play again");
     }
-
-    updateBoard();
 
     if(game_on && moves != 0)
     {
@@ -186,7 +208,6 @@ void GameState::handleEvent(const sf::Event &e) {
                 result = board.makeMove(mouse_board_coords.x, mouse_board_coords.y, FLAG);
                 mines_info->setString("Mines: "+std::to_string(board.getFlaggedMines())+'/'+std::to_string(mines));
             }
-            updateBoard();
         }
     }
 

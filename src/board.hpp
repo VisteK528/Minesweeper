@@ -37,6 +37,7 @@ class Board
         Board(int rows, int columns, int mines);
 
         std::vector<std::vector<Cell>> getBoard() const;
+        bool isPositionValid(int row, int column) const;
         void setBoard(std::vector<std::vector<Cell>> board);
         void loadBoardWithRandomValues(unsigned int mines);
         void displayBoard(int mode);
